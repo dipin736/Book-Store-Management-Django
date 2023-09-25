@@ -1,0 +1,33 @@
+{% extends 'navigation.html' %}
+{% load static %}
+{% block main %}
+
+
+<div class="container">
+    <div class="row">
+        <div >
+            <div>
+                <h1>About Us</h1>
+                <div>
+                    <img src="{% static 'image/about.jpg' %}" class="img-fluid" alt="" >
+                    <br><br>
+                </div>
+                <div class="card">
+                    <div class="card-body " style="line-height: 180%;">
+                        <div class="col-md-12 ">      
+                                <p>Dear readers,</p>
+                                <p>We offer huge collection of books in diverse category of Fiction, Non-fiction, Biographies, History, Religions, Self -Help, Children. We also sell in vast collection of Investments and Management, Computers, Engineering, Medical, College and School text references books proposed by different institutes as syllabus across the country.  Besides to this, we also offer a large collection of E-Books at very fair pricing.</p>
+                                <p>We attempt to extend the customer satisfaction by catering easy user-friendly search engine, quick and user-friendly payment options and quicker delivery systems. Upside to all of this, we are disposed to provide exciting offers and pleasant discounts on our books. </p>               
+                                <p>Our company is a comprehensive online bookstore management. Our philosophy is based on information, communication and education, which we feel should be balanced out with a daily dose of knowledge, wisdom, understanding (overstanding, and innerstanding). </p>
+                        </div>
+                    </div>                 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'shared/footer.html' %}
+
+
+{% endblock main %}
+    

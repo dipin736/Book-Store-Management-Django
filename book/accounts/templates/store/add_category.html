@@ -1,0 +1,33 @@
+{% extends 'admin_home.html' %}
+{% load static %}
+
+
+{% block main %}
+   
+
+<div class="container mt-5">
+    <div class="row m-2 p-3">
+        <div class="col">
+            <div class="card-body">
+                <div class="card">
+                    <form action="" method="post" class=" card m-4">
+                        {% csrf_token %}
+                        <h1 style="color:rebeccapurple ;">Add Category</h1>
+                        <div class="form-group">
+                            <label for="category">Category Name:</label>
+                            <input type="text" name="name" class="form-control " >
+                        </div>
+                        <div>
+                            <button type="submit"  id="id" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+{% endblock main %}
+    

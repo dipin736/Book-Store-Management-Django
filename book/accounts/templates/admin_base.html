@@ -1,0 +1,52 @@
+{% extends 'admin_home.html' %}
+{% load static %}
+
+{% block main %}
+{% csrf_token %}
+
+<div class="container-fluid">
+    <div class="row py-5 text-center">
+        <div class="col-md-4 pt-5 " >
+            <div class="card  bg-warning">
+                <div class="card-body">
+                    <h4 class="m-3">Total Users</h4>
+                    <h5 style="font-size:30px;">{{total_user}}</h5>
+                </div>
+                <div><i class="fa  fa-users p-2"  style="width: 120px;height: 100px; background: white; border-radius:40px ;  font-size: 80px;"></i></div>
+                <div class="card-footer">
+                    <a href="{% url 'view_user' %}" class="text-dark">View Details >></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 pt-5">
+            <div class="card  bg-warning">
+                <div class="card-body">
+                    <h4 class=" m-3">Total Orders</h4>
+                    <h5 style="font-size:30px;">{{total_order}}</h5>
+                </div>
+                <div><i class="fa-solid fa-cart-shopping p-3"  style="width: 120px;height: 100px; background: white; border-radius:40px;  font-size: 80px;"></i></div>
+                <div class="card-footer">
+                    <a href="{% url 'admin_view_booking' %}" class="text-dark">View Details >></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 pt-5 ">
+            <div class="card  bg-warning">
+                <div class="card-body">
+                    <h4 class=" m-3">Total Products </h4>
+                    <h5 style="font-size:30px;">{{total_books}}</h5>
+                </div>
+                <div><i class="fa fa-bar-chart " style="width: 120px;height: 90px; background: white; border-radius:30px;  font-size: 80px;"></i></div>
+                <div class="card-footer">
+                    <a href="{% url 'view_product' %}" class="text-dark">View Details >></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock main %}
+    

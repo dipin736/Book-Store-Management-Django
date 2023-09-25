@@ -1,0 +1,52 @@
+{% extends 'admin_home.html' %}
+
+{% load static %}
+
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="table">
+                <table class="table table table-light table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>USERNAME</th>
+                            <th>EMAIL ID</th>
+                            <!-- <th>PHOTO</th> -->
+                            <th>CONTACT</th>
+                            <th>ADDRESS</th>
+                            <th>USER ROLE</th>
+                            <th>ACTION</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in customers %}
+
+                            <tr>
+                                <td>{{i.id}}</td>
+                                <td>{{i.username}}</td>
+                                <td>{{i.email}}</td>
+                                <!-- <td><img src="/media/{{i.photo}}" style="width:50px"/></td> -->
+                                <td>{{i.phone}}</td>
+                                <td>{{i.address}}</td>
+                                <td>{{i.user_type}}</td>
+
+                                <td>
+                                    <a href="{% url 'delete_category' id=i.id %}"  class=" demo btn btn-danger"> Delete</a>
+                    
+                                </td>
+                            </tr>
+                         
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock main %}

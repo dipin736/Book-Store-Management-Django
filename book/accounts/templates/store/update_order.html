@@ -1,0 +1,25 @@
+{% extends 'admin_home.html' %}
+{% load static %}
+{%load crispy_forms_tags %} 
+
+{% block main %}
+
+
+<form method="post">
+    <div class="container register-form bg-light">
+        <div class="form bg-light">
+                <p>Update Status Of Order</p>
+        
+                {% csrf_token %}
+                {{ form|crispy }}
+        </div>
+    </div>
+    <div>
+        <center>
+            <button type="submit" class="btn btn-outline-primary bg-light">Submit</button>
+        </center>
+    </div>
+
+</form>
+
+{% endblock main %}

@@ -1,0 +1,25 @@
+
+  body{
+    background-image: url('https://wallpaperaccess.com/full/124384.jpg');
+  }
+  #contact{
+    margin-top: -420px;
+    margin-left: 320px;
+   
+  }
+
+footer{
+    background-color:black;
+    color: white;
+    margin-top: 300px;
+
+}
+
+
+.icons{
+    display: flex;
+    margin: 20px;
+    margin-left: 220px;
+    font-size: larger;
+
+}

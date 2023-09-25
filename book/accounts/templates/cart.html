@@ -1,0 +1,82 @@
+{% extends 'user_home.html' %}
+
+{% block main %}
+<div class="container-fluid">
+    <div class="row m-2 p-4">
+            <div class="col-md-8  table-hover  bg-light rounded ">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>IMAGE</th>
+                            <th>CATEGORY</th>
+                            <th>NAME</th>
+                            <th>PRICE</th>
+                            <th>QUANTITY</th>
+                            <th>AUTHOR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><img src="/media/{{cart.book.image}}" style="width:50px"/></td>
+                            <td>{{cart.book.category}}</td>
+                            <td>{{cart.book.title}}</td>
+                            <td>{{cart.book.price}}</td>
+                            <td>{{cart.quantity}}</td>
+                            <td>{{cart.book.author}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            <div class="text-center m-3">
+                <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue Shopping</a>
+                <a href="{% url 'booking' cart.book.id %}" class="btn btn-primary">Proceed to Checkout  <i class="fa fa-forward"></i></a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h2 class=" bg-light text-center">CHECKOUT</h2>
+            <table class="table bg-light" >
+                <!-- <tr>
+                    <td>ITEM TOTAL</td>
+                    <td id="item_total"></td>
+                </tr> -->
+                <tr>
+                    <td>ITEMS:</td>
+                    <td id="items"></td>
+                </tr>                
+                <tr>
+                    <td>DELIVERY</td>
+                    <td>FREE</td>
+                </tr>
+                
+                <tr>
+                    <td>GRAND TOTAL</td>
+                    <td id="grand_total"></td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+      function grandTotal(){
+           $.ajax({
+               url:"{% url 'get_cart_data' %}",
+               type:'get',
+               success:function(data){
+                //    $("#item_total").html(data.price)
+                    $("#items").html(data.items);
+                    $("#grand_total").html(data.price)
+
+               }
+           })
+       }
+       grandTotal();
+      
+
+
+</script>
+  
+
+
+{% endblock main %}
+    

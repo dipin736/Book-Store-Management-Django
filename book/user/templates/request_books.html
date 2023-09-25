@@ -1,0 +1,21 @@
+{% extends 'user_home.html' %}
+
+{% block main %}
+    
+<div class="container bg-light my-5 p-5">
+    <div class="bg-light p-3">
+        <h1 class="text-primary">Request For A Book</h1>
+    </div>
+    <form action="" method="post" class="p-2">
+         {% csrf_token %}
+         <input type="text" name="book_name" id="book_name" placeholder="Book Name">
+
+         <input type="text" name="author" id="author" placeholder="Book Author">
+        
+         <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+
+    </form>     
+</div>
+
+   
+{% endblock main %}

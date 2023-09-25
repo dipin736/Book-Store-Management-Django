@@ -1,0 +1,9 @@
+button{
+    background-color: orange;
+    color: black;
+    border: 20px;
+}
+
+.checked{
+    color: orange;
+}
