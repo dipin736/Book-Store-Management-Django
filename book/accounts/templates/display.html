@@ -1,189 +1,86 @@
 {% extends 'user_home.html' %}
-
 {% load static %}
 
 {% block main %}
+<style>
+    /* #card {
+        height: 95%;
+        width: 90%;
+    }
+     */
+    /* #img {
+        height: 90%;
+    } */
+    #wrapper {
+    margin-top: 1px; /* Adjust the top margin as needed */
+    padding: 1px;
+    background-color: #f8f9fa38; /* Set the background color for the wrapper */
+    border-radius: 10px; /* Optional: Add rounded corners to the wrapper */
+}
 
-<div class="d-flex">
-  <div class="bg-light">
-      <div >
-        <a href="{% url 'display' %}" class="list-group-item list-group-item-action bg-light">All Product</a>
-          {% include 'sidebar.html' %}
-      </div>
-  </div>
-    <div class="container-fluid mt-2">
-        <div class="container-fluid">
-            <div class="row ">
-                {% for i in book %}                   
-                  <div class="col-md-3">
-                    <div class="card m-4 "  style="width:90%">
-                      <img class="p-2 mx-4" src="/media/{{i.image}}" style="width:70%" alt="card-img">
-                      <div class="card-body">
-                        <h6 class="card-title"> {{i.title}} <br> Rs.{{i.price}} <small style="text-decoration: line-through;"> ₹399.00</small></h6>
-                        <div>Author-{{i.author}}</div>
-                          <h6 class="card-text" style="font-size:14px">Stock-{{i.stock}}</h6>  
-                          <div class="mx-3 m-1" style="color: orange ;">
-                            <small class="fa fa-star checked"></small>
-                            <small class="fa fa-star checked"></small>
-                            <small class="fa fa-star checked"></small>
-                            <small class="fa fa-star"></small>
-                            <small class="fa fa-star"></small>
-                          </div>
-                          <!-- <a href="" class="btn btn-danger">Buy Now</a> -->
-                          <a href="{% url 'add_to_cart' i.id %}" class=" btn btn-warning">Add to Cart</a></button>
-                        </div>
-                      </div>
-                  </div>
+#card {
+    height: 95%;
+    width: 90%; /* Set the width to 100% to fill the container */
+    border: 1px solid #dee2e6; /* Optional: Add border to the card */
+    border-radius: 10px; /* Optional: Add rounded corners to the card */
+    overflow: hidden; /* Optional: Hide overflowing content inside the card */
+}
+
+#img {
+    height: 90%; /* Set a fixed height for the image */
+   /* Set the width to 100% to fill the container */
+    object-fit: cover; /* Optional: Maintain the aspect ratio of the image */
+    border-bottom: 1px solid #dee2e6; /* Optional: Add a border at the bottom of the image */
+}
+
+.card-body {
+    padding: 13px;
+}
+
+.fa-star.checked {
+    color: orange; /* Set the color for checked stars */
+}
+
+</style>
+
+<div id="wrapper" class="container-fluid">
+    <div class="row">
+        <!-- Sidebar with categories -->
+        <div class="col-md-2 bg-light">
+            <div class="list-group">
+                <a href="{% url 'display' %}" class="list-group-item list-group-item-action bg-light">All Product</a>
+                <span>Selected Category: {{ selected_category.name | default:'0' }}</span>
+                {% for category in categories %}
+                <a href="{% url 'sidebar' id=category.id %}" class="list-group-item list-group-item-action bg-light">{{ category.name }}</a>
                 {% endfor %}
-              </div>
-          </div>
-      </div>
-  </div>
-
- 
-  {% endblock main %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-<div class="d-flex " >
-    <div class=" bg-light " >
-        <div class="list-group-item"> 
-
-          {% include 'sidebar.html' %}
-
-            {% for i in category %}
-              <div class="list-group-item list-group-item-action bg-light">{{i.name}}</div>
-            {% endfor %}
+            </div>
         </div>
-    <div id="page-content-wrapper">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light ">
-          <button class="btn btn-primary" id="menu-toggle"><i class="fa fa-bars"></i></button>
-        </nav>
-        <div class="container-fluid mt-2">
-            <div class="container-fluid ">
-                <div class="row m-3" style="width: 90%;">
-                    {% for i in book %}                   
-                      <div class="col-md-3">
-                        <div class="card"  style="border:3px solid lightgrey ;text-align: center;">
-                          <img  src="/media/{{i.image}}" style="width:95%" >
-                          <div class="card-body">
-                            <h6 class="card-title">{{i.title}} <br>
-                               Rs.{{i.price}}
-                               <div>
-                                <span class="fa fa-star checked"></span>
-                                <span class="fa fa-star checked"></span>
-                                <span class="fa fa-star checked"></span>
-                                <span class="fa fa-star"></span>
-                                <span class="fa fa-star"></span>
-                              </div>
-                              </h6>
-                            <p class="card-text" style="font-size:14px">{{i.author}}</p>
-                            <button type="submit" class="btn btn-warning"> Add to Cart</button>
-                            <button type="submit" class="btn btn-warning">Buy Now</button>
 
-                          </div>
+        <!-- Display books -->
+        <div class="col-md-10">
+            <div class="row">
+                {% for i in books %}                   
+                <div class="col-md-3">
+                    <div class="card m-4" id="card">
+                        <img class="p-2 mx-4" src="/media/{{i.image}}" id="img" alt="card-img">
+                        <div class="card-body">
+                            <h6 class="card-title"> {{i.title}} <br> Rs.{{i.price}} <small style="text-decoration: line-through;"> ₹399.00</small></h6>                           
+                            <div>Author-{{i.author}}</div>
+                            <h6 class="card-text" style="font-size:14px">Stock-{{i.stock}}</h6>  
+                            <div class="mx-3 m-1" style="color: orange ;">
+                                <small class="fa fa-star checked"></small>
+                                <small class="fa fa-star checked"></small>
+                                <small class="fa fa-star checked"></small>
+                                <small class="fa fa-star"></small>
+                                <small class="fa fa-star"></small>
+                            </div>
+                            <a href="{% url 'add_to_cart' i.id %}" class=" btn btn-warning">Add to Cart</a>
                         </div>
                     </div>
-                  {% endfor %}
                 </div>
-            </div>
-        </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-   -->
-   
-
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="{% static 'css/product.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-</head>
-<body>
-    <div class="container">
-        <h1 style="color: aqua;">Law Book</h1>
-        <div class="row">
-            <div class="col">
-                <div class="card " style="width: 200px; height: 480px;">
-                    <img class="card-img-top" src="{% static 'products/51Px3PG300L._SX328_BO1204203200__R9YzwLS.jpg' %}" style="width:200px; height: 250px;" alt="">
-                    <div class="card-body">
-                         <p class="card-text">Durga Das Babu</p>    
-                        <h4 class="card-text">₹270.00 <small style="text-decoration: line-through;"> ₹399.00</small></h4>
-                        <p class="card-title">Indian Constitution</p>
-                            <small>
-                                <i class="fa fa-star checked"></i>
-                                <i class="fa fa-star checked"></i>
-                                <i class="fa fa-star checked"></i>
-                                <i class="fa fa-star"></i>
-                                <i class="fa fa-star "></i>
-                            </small>
-                            
-                          <button type="submit" class="btn btn-warning btn-block"><a href="">Add to cart</a></button> 
-                          <button type="submit" class="btn btn-warning btn-block"><a href="">Buy Now</a></button>     
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="card">
-                    <img class="card-img-top" src="holder.js/100x180/" alt="">
-                    <div class="card-body">
-                        <h4 class="card-title">Title</h4>
-                        <p class="card-text">Text</p>
-                    </div>
-                </div>
-            </div><div class="col">
-                <div class="card">
-                    <img class="card-img-top" src="holder.js/100x180/" alt="">
-                    <div class="card-body">
-                        <h4 class="card-title">Title</h4>
-                        <p class="card-text">Text</p>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-    
-</body>
-</html>  --> -->  
-    
-
-
-    
-    
+</div>
+{% endblock main %}

@@ -135,11 +135,14 @@ def view_user(request,):
 
 @login_required(login_url='account_login')
 def display(request):
-    context={
-        'category':Category.objects.all(),
-         'book':Book.objects.all()
-        }
-    return render(request,'display.html',context)
+    categories = Category.objects.all()
+    books = Book.objects.all()
+    context = {
+        'categories': categories,
+        'books': books,
+    }
+    return render(request, 'display.html', context)
+
 
 @login_required(login_url='account_login')
 def delete_user(request, id):
@@ -148,10 +151,20 @@ def delete_user(request, id):
     return redirect('view_user')
 
 @login_required(login_url='account_login')
-def sidebar(request,id):
-    book=Book.objects.filter (id=id)
-    return render(request,'display.html',{'book':book})
 
+@login_required(login_url='account_login')
+def sidebar(request, id):
+    selected_category = get_object_or_404(Category, id=id)
+    categories = Category.objects.all()
+    books = Book.objects.filter(category=selected_category)  # Filter books based on the selected category
+
+    context = {
+        'selected_category': selected_category,
+        'categories': categories,
+        'books': books,
+    }
+
+    return render(request, 'display.html', context)
 
 
 @login_required(login_url='account_login')
