@@ -2,56 +2,62 @@
 {% load static %}
 
 {% block main %}
-<style>
-    /* #card {
-        height: 95%;
-        width: 90%;
-    }
-     */
-    /* #img {
-        height: 90%;
-    } */
-    #wrapper {
-    margin-top: 1px; /* Adjust the top margin as needed */
-    padding: 1px;
-    background-color: #f8f9fa38; /* Set the background color for the wrapper */
-    border-radius: 10px; /* Optional: Add rounded corners to the wrapper */
-}
 
-#card {
-    height: 95%;
-    width: 90%; /* Set the width to 100% to fill the container */
-    border: 1px solid #dee2e6; /* Optional: Add border to the card */
-    border-radius: 10px; /* Optional: Add rounded corners to the card */
-    overflow: hidden; /* Optional: Hide overflowing content inside the card */
-}
-
-#img {
-    height: 90%; /* Set a fixed height for the image */
-   /* Set the width to 100% to fill the container */
-    object-fit: cover; /* Optional: Maintain the aspect ratio of the image */
-    border-bottom: 1px solid #dee2e6; /* Optional: Add a border at the bottom of the image */
-}
-
-.card-body {
-    padding: 13px;
-}
-
-.fa-star.checked {
-    color: orange; /* Set the color for checked stars */
-}
-
-</style>
+{% block script %}
+<link rel="stylesheet" href="{% static 'css/display.css' %}">    
+{% endblock script %}
+    
 
 <div id="wrapper" class="container-fluid">
     <div class="row">
         <!-- Sidebar with categories -->
-        <div class="col-md-2 bg-light">
-            <div class="list-group">
+        <div class="col-md-2 bg-light pt-3">
+            <div class="list-group p-3 mt-4">
                 <a href="{% url 'display' %}" class="list-group-item list-group-item-action bg-light">All Product</a>
-                <span>Selected Category: {{ selected_category.name | default:'0' }}</span>
+                    <div class="a-section a-spacing-none">
+                    <div class="a-section a-spacing-small">
+                      <span class="a-size-base a-color-base a-text-bold" dir="auto"
+                        >New Arrivals</span
+                      >
+                    </div>
+                    <ul class="a-unordered-list a-nostyle a-vertical a-spacing-medium">
+                      <li class="a-spacing-micro">
+                        <span class="a-list-item">
+                          <a
+                            class="a-link-normal"
+                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684819031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_0"
+                          >
+                            <span class="a-size-base a-color-base" dir="auto">Last 30 days</span>
+                          </a>
+                        </span>
+                      </li>
+                  
+                      <li class="a-spacing-micro">
+                        <span class="a-list-item">
+                          <a
+                            class="a-link-normal"
+                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684820031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_1"
+                          >
+                            <span class="a-size-base a-color-base" dir="auto">Last 90 days</span>
+                          </a>
+                        </span>
+                      </li>
+                  
+                      <li class="a-spacing-micro">
+                        <span class="a-list-item">
+                          <a
+                            class="a-link-normal"
+                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684821031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_2"
+                          >
+                            <span class="a-size-base a-color-base" dir="auto">Next 90 days</span>
+                          </a>
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                <span class="p-3">Selected Category: {{ selected_category.name | default:'0' }}</span>
                 {% for category in categories %}
-                <a href="{% url 'sidebar' id=category.id %}" class="list-group-item list-group-item-action bg-light">{{ category.name }}</a>
+                <a href="{% url 'sidebar' id=category.id %}" class="list-group-item list-group-item-action bg-light p-3">{{ category.name }}</a>
                 {% endfor %}
             </div>
         </div>
@@ -64,17 +70,22 @@
                     <div class="card m-4" id="card">
                         <img class="p-2 mx-4" src="/media/{{i.image}}" id="img" alt="card-img">
                         <div class="card-body">
-                            <h6 class="card-title"> {{i.title}} <br> Rs.{{i.price}} <small style="text-decoration: line-through;"> ₹399.00</small></h6>                           
+                            <h6 class="card-title"> {{i.title}} <br> Rs.{{i.price}} <small style="text-decoration: line-through;"> ₹699.00</small></h6>                           
                             <div>Author-{{i.author}}</div>
-                            <h6 class="card-text" style="font-size:14px">Stock-{{i.stock}}</h6>  
-                            <div class="mx-3 m-1" style="color: orange ;">
-                                <small class="fa fa-star checked"></small>
-                                <small class="fa fa-star checked"></small>
-                                <small class="fa fa-star checked"></small>
-                                <small class="fa fa-star"></small>
-                                <small class="fa fa-star"></small>
-                            </div>
+                            <h6 class="card-text" style="font-size:14px;display: flex; align-items: center;">Stock-{{i.stock}}</h6>  
+                            <div class="mx-3 m-1" style="display: flex; align-items: center;">
+                              {% for _ in "12345" %}
+                                  {% if i.avg_rating >= forloop.counter %}
+                                      <small class="fa fa-star checked" style="margin-right: 3px;"></small>
+                                  {% else %}
+                                      <small class="fa fa-star" style="margin-right: 3px;"></small>
+                                  {% endif %}
+                              {% endfor %}
+                              <span class="{% if i.avg_rating %} orange-text{% endif %}" style="margin-right: 5px;">{{ i.avg_rating|floatformat:1|default:"" }}</span>
+                              <span style="margin-right: 10px;">({{ i.num_reviews }})</span>
+                          </div>
                             <a href="{% url 'add_to_cart' i.id %}" class=" btn btn-warning">Add to Cart</a>
+                            <a href="{% url 'book_details' i.id %}" class="btn btn-info">View Book</a>
                         </div>
                     </div>
                 </div>
@@ -83,4 +94,8 @@
         </div>
     </div>
 </div>
+
 {% endblock main %}
+
+
+

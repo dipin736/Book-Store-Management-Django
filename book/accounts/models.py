@@ -1,6 +1,6 @@
 from django.db import models
 from user.models import User
-
+from django.utils import timezone
 
 # Create your models here.
 
@@ -17,6 +17,7 @@ class Book(models.Model):
     author = models.CharField(max_length=100)
     price = models.CharField(max_length=100)
     stock = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -30,8 +31,8 @@ class Cart(models.Model):
     added_on=models.DateTimeField(auto_now_add=True)
     updated_on=models.DateTimeField(auto_now_add=True)
 
-    def str(self):
-        return self.user
+    def __str__(self):
+        return str(self.user)
     
 
 
@@ -56,6 +57,16 @@ class Order(models.Model):
     status=models.BooleanField(max_length=50,default=False)
     payment_method = models.CharField(max_length = 20,choices=PAYMENT)
 
+
+    def __str__(self):
+        return self.user.username
+
+class  review(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    review_desp = models.CharField(max_length=100)
+    rating = models.IntegerField()
+    created_at = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.user.username

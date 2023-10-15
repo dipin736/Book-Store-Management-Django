@@ -1,0 +1,42 @@
+
+    /* #card {
+        height: 95%;
+        width: 90%;
+    }
+     */
+    /* #img {
+        height: 90%;
+    } */
+    #wrapper {
+    margin-top: 1px; /* Adjust the top margin as needed */
+    padding: 1px;
+    background-color: #f8f9fa38; /* Set the background color for the wrapper */
+    border-radius: 10px; /* Optional: Add rounded corners to the wrapper */
+}
+
+#card {
+    height: 95%;
+    width: 90%; /* Set the width to 100% to fill the container */
+    border: 1px solid #dee2e6; /* Optional: Add border to the card */
+    border-radius: 10px; /* Optional: Add rounded corners to the card */
+    overflow: hidden; /* Optional: Hide overflowing content inside the card */
+}
+
+#img {
+    height: 90%; /* Set a fixed height for the image */
+   /* Set the width to 100% to fill the container */
+    object-fit: cover; /* Optional: Maintain the aspect ratio of the image */
+    border-bottom: 1px solid #dee2e6; /* Optional: Add a border at the bottom of the image */
+
+        margin: 10px; /* Adjust the margin to reduce the gap between cards */
+  
+    
+}
+
+.card-body {
+    padding: 13px;
+}
+
+.fa-star.checked {
+    color: orange; /* Set the color for checked stars */
+}

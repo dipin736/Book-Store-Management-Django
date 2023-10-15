@@ -15,8 +15,8 @@ urlpatterns = [
     path('requested_books/',requested_books, name='requested_books'),
     path("delete_books/<int:id>/",delete_books, name="delete_books"),
 
-
-
+    # path('books/', book_list, name='book_list'),
+   path('search/', search_books, name='search_books'),
    
 
 

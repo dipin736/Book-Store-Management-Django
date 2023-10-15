@@ -13,13 +13,60 @@
     
     <style>
         body{ 
-            background-image: url('https://wallpaperaccess.com/full/124383.jpg'); 
+            /* background-image: url('https://wallpaperaccess.com/full/124383.jpg');  */
         }
+        .main-navbar{
+    border-bottom: 1px solid #ccc;
+}
+.main-navbar .top-navbar{
+    background-color: #2874f0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.main-navbar .top-navbar .brand-name{
+    color: #fff;
+}
+.main-navbar .top-navbar .nav-link{
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+}
+.main-navbar .top-navbar .dropdown-menu{
+    padding: 0px 0px;
+    border-radius: 0px;
+}
+.main-navbar .top-navbar .dropdown-menu .dropdown-item{
+    padding: 8px 16px;
+    border-bottom: 1px solid #ccc;
+    font-size: 14px;
+}
+.main-navbar .top-navbar .dropdown-menu .dropdown-item i{
+    width: 20px;
+    text-align: center;
+    color: #2874f0;
+    font-size: 14px;
+}
+.main-navbar .navbar{
+    padding: 0px;
+    background-color: #ddd;
+}
+.main-navbar .navbar .nav-item .nav-link{
+    padding: 8px 20px;
+    color: #000;
+    font-size: 15px;
+}
+
+@media only screen and (max-width: 600px) {
+    .main-navbar .top-navbar .nav-link{
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+}
+
     </style>
-    </head>
+  </head>
   <body>
-
-
+<!-- 
     <nav class="navbar navbar-expand-sm navbar-dark  bg-danger">
         <a class="navbar-brand" href="#" style="color: rgb(0, 0, 0);"> <i class="fa-sharp fa-solid fa-book"></i> BOOK ONLINE STORE</a>
         <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
@@ -47,12 +94,72 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{% url 'logoutuser' %}">Logout</a>
                 </li>
-            
-            </ul>
-            
+            </ul>      
         </div>
     </nav>
-    
+     -->
+    <div class="main-navbar shadow-sm sticky-top">
+        <div class="top-navbar bg-danger">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-2 my-auto d-none d-sm-none d-md-block d-lg-block">
+                        <h5 class="brand-name">
+                            <a class="navbar-brand" href="{% url 'display' %}" style="color: wheat;"> <i class="fa-sharp fa-solid fa-book"></i> BOOK ONLINE STORE</a>
+                        </h5>
+                    </div>
+                    <div class="col-md-5 my-auto">
+                        <form  method="get" action="{% url 'search_books' %}" role="search ">
+                            <div class="input-group">
+                                <input type="search" name="title" placeholder="Search your product" class="form-control" required />
+                                <button class="btn bg-white" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <!-- <form method="get" action="{% url 'search_books' %}">
+                            <input type="search" name="title" placeholder="Search your product" />
+                            <button type="submit">Search</button>
+                        </form> -->
+                    </div>
+                    <div class="col-md-5 my-auto">
+                        <ul class="nav justify-content-end">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'display' %}">
+                                    <i class="fa fa-home" aria-hidden="true"></i> Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <i class="fa fa-shopping-cart"></i> Cart (0)
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                    <i class="fa fa-heart"></i> Wishlist (0)
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <!-- <i class="fa fa-user"></i> -->
+                                    <img src="{{ user.photo.url }}" alt="Profile Photo" style="width: 25px; border-radius:50%;">
+                                    {{request.user.username}}
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'account_update'  %}"><i class="fa fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'view_order' %}"><i class="fa fa-list"></i> My Orders</a></li>
+                                <li><a class="dropdown-item" href="{% url 'request_books' %}"><i class="fa fa-list"></i>Request</a></li> 
+                                <li><a class="dropdown-item" href="#"><i class="fa fa-heart"></i> My Wishlist</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fa fa-shopping-cart"></i> My Cart</a></li>
+                                <li><a class="dropdown-item" href="{% url 'logoutuser' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
     
 {% block main %}
 

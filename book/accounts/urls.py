@@ -39,7 +39,7 @@ urlpatterns = [
     path('delete_order/<int:id>',delete_order,name='delete_order'),
 
 
-
+    path('book/<int:id>/',book_details, name='book_details'),
 
     
 

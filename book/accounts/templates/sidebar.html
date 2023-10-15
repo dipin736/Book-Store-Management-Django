@@ -1,26 +1,285 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body>
+{% extends 'user_home.html' %}
 
-  <div class="list-group-item">
-    <!-- <h3>Selected Category: {{ selected_category.name }}</h3> -->
-    {% for category in categories %}
-        <li class="list-group-item"><a href="{% url 'sidebar' id=category.id %}" style="color: black;">{{ category.name }}</a></li>
-    {% endfor %}
+{% load static %}
+
+{% block main %}
+
+<link rel="stylesheet" href="{% static 'css/details.css' %}">
+
+<div class="container pt-5">
+  <div class="card center">
+    <div class="row no-gutters">
+      <div class="col-md-4">
+        <img src="{{ book.image.url }}" alt="{{ book.title }}" class="card-img">
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <div class="category text-bold">
+            Category:{{categories}}
+          </div>
+          <h5 class="card-title product-title text-bold my-3">{{ book.title }}</h5>
+          <h4 class="card-text text-success">Author: {{ book.author }}</h4>
+          <p class="card-text new-price text-bold mb-1">Price: ₹{{ book.price }}</p>
+          <!-- Add to Cart and Buy Now Buttons -->
+          <div class="buttons d-flex my-5">
+            <div class="block">
+              <a href="#" class="btn btn-warning custom-btn">Add to Cart</a>
+            </div>
+            <div class="block">
+              <a href="{% url 'add_to_cart' id=book.id %}" class="btn btn-danger custom-btn">Buy Now</a>
+            </div>
+          </div>
+          <div class="row questions bg-light p-3">
+            <div class="col-md-1 icon">
+              <i class="fa-brands fa-rocketchat questions-icon"></i>
+            </div>
+            <div class="col-md-11 text">
+              Have a question about our products at E-Store? Feel free to contact our representatives via live chat or
+              email.
+            </div>
+          </div>
+          <div class="delivery my-4">
+            <p class="font-weight-bold mb-0"><span><i class="fa-solid fa-truck"></i></span> <b>Delivery done in 3 days
+                from date of purchase</b> </p>
+            <p class="text-secondary">Order now to get this product delivery</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="product-info-tabs">
+          <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="description-tab" data-toggle="tab" href="#description" role="tab"
+                aria-controls="description" aria-selected="true">Description</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="review-tab" data-toggle="tab" href="#review" role="tab" aria-controls="review"
+                aria-selected="false">Reviews ({{ reviews.count }})</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+              <div class="description">
+                <div class="partial-text">
+                  {{ book.description|truncatechars:200 }} <!-- Display first 200 characters as partial text -->
+                </div>
+                <div class="full-text hide">
+                  {{ book.description }} <!-- Display the full description, initially hidden -->
+                </div>
+                <button class="read-more-button">Read More</button>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
+              <ul>
+                {% if reviews %}
+                    {% for x in reviews %}
+                        <span>{{ x.created_at }}</span> :
+                        <span>{{ x.user }}</span> :
+                        <span>{{ x.review_desp }}</span>
+        
+                        {% if x.rating > 0 %}
+                            <div>
+                                <i class="fa fa-star {% if x.rating < 1 %} no-checked {% else %} checked {% endif %}" id="check-star"></i>
+                                <i class="fa fa-star {% if x.rating < 2 %} no-checked {% else %} checked {% endif %}" id="check-star"></i>
+                                <i class="fa fa-star {% if x.rating < 3 %} no-checked {% else %} checked {% endif %}" id="check-star"></i>
+                                <i class="fa fa-star {% if x.rating < 4 %} no-checked {% else %} checked {% endif %}" id="check-star"></i>
+                                <i class="fa fa-star {% if x.rating < 5 %} no-checked {% else %} checked {% endif %}" id="check-star"></i>
+                                <hr>
+                            </div>
+                        {% else %}
+                            <span>No ratings</span>
+                            <hr>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <span>No reviews yet</span>
+                {% endif %}
+            </ul>
+              <form class="review-form" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label>Your rating</label>
+                  <div class="reviews-counter">
+                    <div class="rate">
+                      <input type="radio" id="star5" name="rate" value="5" />
+                      <label for="star5" title="text" aria-hidden="true">5 stars</label>
+                      <input type="radio" id="star4" name="rate" value="4" aria-hidden="true" />
+                      <label for="star4" title="text">4 stars</label>
+                      <input type="radio" id="star3" name="rate" value="3" aria-hidden="true" />
+                      <label for="star3" title="text">3 stars</label>
+                      <input type="radio" id="star2" name="rate" value="2" aria-hidden="true" />
+                      <label for="star2" title="text">2 stars</label>
+                      <input type="radio" id="star1" name="rate" value="1" aria-hidden="true" />
+                      <label for="star1" title="text">1 star</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Your message</label>
+                  <textarea class="form-control" name="review_desp"  rows="10"></textarea>
+                </div>
+                <!-- <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <input type="text" name="" class="form-control" placeholder="Name*">
+                    </div>
+                  </div>
+                </div> -->
+                <button class="round-black-btn">Submit Review</button>
+              </form>
+            </div>
+
+            <!-- Star Rating -->
+
+
+            <!-- Reviews Section -->
+           
+
+            <!-- Review Form -->
+            <!-- <form class="review-form" method="post">
+              {% csrf_token %}
+              <div class="form-group">
+                <label>Your rating</label>
+                <div class="reviews-counter">
+                  <div class="rate">
+                    <input type="radio" id="star5" name="rate" value="5" />
+                    <label for="star5" title="text" aria-hidden="true">5 stars</label>
+                    <input type="radio" id="star4" name="rate" value="4" aria-hidden="true" />
+                    <label for="star4" title="text">4 stars</label>
+                    <input type="radio" id="star3" name="rate" value="3" aria-hidden="true" />
+                    <label for="star3" title="text">3 stars</label>
+                    <input type="radio" id="star2" name="rate" value="2" aria-hidden="true" />
+                    <label for="star2" title="text">2 stars</label>
+                    <input type="radio" id="star1" name="rate" value="1" aria-hidden="true" />
+                    <label for="star1" title="text">1 star</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Your review</label>
+                <textarea class="form-control" name="review_desp" rows="10"></textarea>
+              </div>
+              <button type="submit">Submit Review</button>
+            </form> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 
-    
-</div>
-</body>
-</html>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var descriptions = document.querySelectorAll('.description');
+
+    descriptions.forEach(function (description) {
+      var readMoreButton = description.querySelector('.read-more-button');
+      var partialText = description.querySelector('.partial-text');
+      var fullText = description.querySelector('.full-text');
+
+      readMoreButton.addEventListener('click', function () {
+        partialText.classList.toggle('hide');
+        fullText.classList.toggle('show');
+        if (partialText.classList.contains('hide')) {
+          readMoreButton.textContent = 'Read Less';
+        } else {
+          readMoreButton.textContent = 'Read More';
+        }
+      });
+    });
+  });
+
+</script>
+
+
+
+<!-- <script>
+$(document).ready(function() {
+		    var slider = $("#slider");
+		    var thumb = $("#thumb");
+		    var slidesPerPage = 4; //globaly define number of elements per page
+		    var syncedSecondary = true;a
+		    slider.owlCarousel({
+		        items: 1,
+		        slideSpeed: 2000,
+		        nav: false,
+		        autoplay: false, 
+		        dots: false,
+		        loop: true,
+		        responsiveRefreshRate: 200
+		    }).on('changed.owl.carousel', syncPosition);
+		    thumb
+		        .on('initialized.owl.carousel', function() {
+		            thumb.find(".owl-item").eq(0).addClass("current");
+		        })
+		        .owlCarousel({
+		            items: slidesPerPage,
+		            dots: false,
+		            nav: true,
+		            item: 4,
+		            smartSpeed: 200,
+		            slideSpeed: 500,
+		            slideBy: slidesPerPage, 
+		        	navText: ['<svg width="18px" height="18px" viewBox="0 0 11 20"><path style="fill:none;stroke-width: 1px;stroke: #000;" d="M9.554,1.001l-8.607,8.607l8.607,8.606"/></svg>', '<svg width="25px" height="25px" viewBox="0 0 11 20" version="1.1"><path style="fill:none;stroke-width: 1px;stroke: #000;" d="M1.054,18.214l8.606,-8.606l-8.606,-8.607"/></svg>'],
+		            responsiveRefreshRate: 100
+		        }).on('changed.owl.carousel', syncPosition2);
+		    function syncPosition(el) {
+		        var count = el.item.count - 1;
+		        var current = Math.round(el.item.index - (el.item.count / 2) - .5);
+		        if (current < 0) {
+		            current = count;
+		        }
+		        if (current > count) {
+		            current = 0;
+		        }
+		        thumb
+		            .find(".owl-item")
+		            .removeClass("current")
+		            .eq(current)
+		            .addClass("current");
+		        var onscreen = thumb.find('.owl-item.active').length - 1;
+		        var start = thumb.find('.owl-item.active').first().index();
+		        var end = thumb.find('.owl-item.active').last().index();
+		        if (current > end) {
+		            thumb.data('owl.carousel').to(current, 100, true);
+		        }
+		        if (current < start) {
+		            thumb.data('owl.carousel').to(current - onscreen, 100, true);
+		        }
+		    }
+		    function syncPosition2(el) {
+		        if (syncedSecondary) {
+		            var number = el.item.index;
+		            slider.data('owl.carousel').to(number, 100, true);
+		        }
+		    }
+		    thumb.on("click", ".owl-item", function(e) {
+		        e.preventDefault();
+		        var number = $(this).index();
+		        slider.data('owl.carousel').to(number, 300, true);
+		    });
+
+
+            $(".qtyminus").on("click",function(){
+                var now = $(".qty").val();
+                if ($.isNumeric(now)){
+                    if (parseInt(now) -1> 0)
+                    { now--;}
+                    $(".qty").val(now);
+                }
+            })            
+            $(".qtyplus").on("click",function(){
+                var now = $(".qty").val();
+                if ($.isNumeric(now)){
+                    $(".qty").val(parseInt(now)+1);
+                }
+            });
+		});
+</script> -->
+
+{% endblock main %}
 
 
 <!-- 
@@ -73,11 +332,11 @@
 
   </div>
    -->
-   
 
 
 
-   
+
+
 <!-- ................ -->
 
 
@@ -142,5 +401,4 @@
     </div>
     
 </body>
-</html>  --> -->  
-    
+</html>  --> -->

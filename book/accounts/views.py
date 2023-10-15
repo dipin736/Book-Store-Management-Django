@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Category,Book,Cart,Order
+from .models import Category,Book,Cart,Order, review
 from .forms import BookModelForm,OrderModelForm,OrderForm
 from user.models import User
 from django.http import JsonResponse
@@ -132,17 +132,43 @@ def view_user(request,):
     customers=User.objects.all()
     return render(request,'view_user.html',{'customers':customers})
 
-
+from django.db.models import Avg, Count
 @login_required(login_url='account_login')
 def display(request):
     categories = Category.objects.all()
-    books = Book.objects.all()
+    books = Book.objects.annotate(avg_rating=Avg('review__rating'), num_reviews=Count('review'))
     context = {
         'categories': categories,
         'books': books,
     }
     return render(request, 'display.html', context)
 
+    
+def book_details(request, id):
+    book = get_object_or_404(Book, id=id)
+    categories = book.category.name
+    reviews = review.objects.filter(book=book)
+    related_books = Book.objects.filter(category=book.category).exclude(id=id)[:3]  # Exclude the current book from related books
+
+    if request.method == 'POST':
+        user = request.user
+        star_rating = request.POST['rate']
+        review_text = request.POST['review_desp']
+
+        if star_rating and review_text:
+            review_instance = review(user=user, book=book, rating=star_rating, review_desp=review_text)
+            review_instance.save()
+
+            return redirect('book_details', id=book.id)
+            # Redirect to the same product details page after the review is submitted
+    
+    context = {
+        'book': book,
+        'categories':categories,
+        'related_books': related_books,
+        'reviews': reviews
+    }
+    return render(request, 'sidebar.html', context)
 
 @login_required(login_url='account_login')
 def delete_user(request, id):
@@ -262,3 +288,27 @@ def delete_order(request,id):
     myorder.delete()
     return redirect("admin_view_booking")
 
+
+from django.http import HttpResponse
+def review_page(request, id):
+    book_details = Book.objects.get(id=id)
+    
+    if request.method == 'POST':
+        user = request.user
+        star_rating = request.POST['rate']
+        book_review = request.POST['book_review']
+
+        # Validate form data (ensure both fields have values)
+        if star_rating and book_review:
+            # Create and save the review
+            review_instance = review(user=user, book=book_details, rating=star_rating, review_desp=book_review)
+            review_instance.save()
+
+            # Redirect to a thank you page or display a success message
+            return HttpResponse("Review successfully submitted!")
+        else:
+            # Handle form validation errors (you might want to display an error message to the user)
+            return HttpResponse("Invalid form data. Please provide both rating and review description.")
+
+    # If the request method is GET, render the form page
+    return render(request, "display.html")
