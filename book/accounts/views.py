@@ -36,7 +36,7 @@ def contact(request):
 
 
 
-
+# ...... admin side.....
 
 def admin_logout(request):
     logout(request)
@@ -60,6 +60,9 @@ def admin_base(request):
         'total_user':total_user,
     }
     return render(request,'admin_base.html',context)
+
+
+# ....category......
 
 @login_required
 def add_category(request):
@@ -90,6 +93,8 @@ def delete_category(request,id):
     category = Category.objects.get(id=id)
     category.delete()
     return redirect('view_category')
+
+# ......product.....
 
 @login_required
 def add_product(request):
@@ -126,6 +131,7 @@ def delete_product(request, id):
     book.delete()
     return redirect('store/view_product')
 
+# .......user.....
 
 @login_required
 def view_user(request,):
@@ -192,6 +198,7 @@ def sidebar(request, id):
 
     return render(request, 'display.html', context)
 
+# .....Buy now, cart... 
 
 @login_required(login_url='account_login')
 def add_to_cart(request,id):
@@ -229,6 +236,8 @@ def get_cart_data(request):
     }
     return JsonResponse(res)
 
+
+# razor pay
 import razorpay
 
 @login_required(login_url='account_login')
@@ -262,6 +271,9 @@ def booking(request,id):
     return render(request, 'booking.html', {"form": form})
 
 
+
+# .....order.....
+
 @login_required(login_url='account_login')
 def view_order(request):
     myorder = Order.objects.filter(user_id= request.user.id)
@@ -288,27 +300,3 @@ def delete_order(request,id):
     myorder.delete()
     return redirect("admin_view_booking")
 
-
-from django.http import HttpResponse
-def review_page(request, id):
-    book_details = Book.objects.get(id=id)
-    
-    if request.method == 'POST':
-        user = request.user
-        star_rating = request.POST['rate']
-        book_review = request.POST['book_review']
-
-        # Validate form data (ensure both fields have values)
-        if star_rating and book_review:
-            # Create and save the review
-            review_instance = review(user=user, book=book_details, rating=star_rating, review_desp=book_review)
-            review_instance.save()
-
-            # Redirect to a thank you page or display a success message
-            return HttpResponse("Review successfully submitted!")
-        else:
-            # Handle form validation errors (you might want to display an error message to the user)
-            return HttpResponse("Invalid form data. Please provide both rating and review description.")
-
-    # If the request method is GET, render the form page
-    return render(request, "display.html")
