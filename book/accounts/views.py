@@ -2,23 +2,21 @@ from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Category,Book,Cart,Order, review
+from .models import Category,Book,Cart,Order, review,OrderItem
 from .forms import BookModelForm,OrderModelForm,OrderForm
 from user.models import User
 from django.http import JsonResponse
 from django.core.mail import send_mail
-
+from django.db.models import Avg, Count
+import uuid
+from django.contrib import messages
 # Create your views here.
 
-
-
+# .....HOME/HEADER/FOOTER .............. starts
 def home(request):
     return render(request, 'base.html')
-
-
 def about(request):
     return render(request, 'shared/about.html')
-
 def contact(request):
     if request.method=='POST':
         message_name=request.POST['name']
@@ -33,16 +31,15 @@ def contact(request):
         return render(request, 'shared/contact.html')
     else:
        return render(request, 'shared/contact.html')
+    
+# .....HOME/HEADER/FOOTER.............. end
 
 
 
-# ...... admin side.....
-
+# ...... ADMIN SIDE FUNCTIONS.....starts
 def admin_logout(request):
     logout(request)
     return redirect('home')
-
-
 
 @login_required
 def admin_base(request):
@@ -62,8 +59,10 @@ def admin_base(request):
     return render(request,'admin_base.html',context)
 
 
-# ....category......
+# ................ ADMIN SIDE FUNCTIONS................starts
 
+
+# ......................CATEGORY...................... starts
 @login_required
 def add_category(request):
     if request.method == "POST":
@@ -76,7 +75,6 @@ def view_category(request):
     context={
         'category':Category.objects.all(),
         }
-    
     return render(request,'store/view_category.html',context)
 
 @login_required
@@ -94,8 +92,10 @@ def delete_category(request,id):
     category.delete()
     return redirect('view_category')
 
-# ......product.....
+# ....................CATEGORY..................... ends
 
+
+# .......................BOOKS...............starts
 @login_required
 def add_product(request):
     # form=BookModelForm()
@@ -130,32 +130,38 @@ def delete_product(request, id):
     book = Book.objects.get(id=id)
     book.delete()
     return redirect('store/view_product')
+# .........................BOOKS..........................end
 
-# .......user.....
+
+# .................USER HOME..........starts
 
 @login_required
 def view_user(request,):
     customers=User.objects.all()
     return render(request,'view_user.html',{'customers':customers})
 
-from django.db.models import Avg, Count
+
+# ............HOME PAGE BOOKS..........
+
 @login_required(login_url='account_login')
 def display(request):
     categories = Category.objects.all()
     books = Book.objects.annotate(avg_rating=Avg('review__rating'), num_reviews=Count('review'))
+    cart_item_count = Cart.objects.filter(user=request.user).count()
     context = {
         'categories': categories,
         'books': books,
+        'cart_item_count': cart_item_count,
     }
     return render(request, 'display.html', context)
 
-    
+# ................VIEW SINGLE BOOK..........
 def book_details(request, id):
     book = get_object_or_404(Book, id=id)
     categories = book.category.name
     reviews = review.objects.filter(book=book)
     related_books = Book.objects.filter(category=book.category).exclude(id=id)[:3]  # Exclude the current book from related books
-
+    cart_item_count = Cart.objects.filter(user=request.user).count()
     if request.method == 'POST':
         user = request.user
         star_rating = request.POST['rate']
@@ -172,7 +178,8 @@ def book_details(request, id):
         'book': book,
         'categories':categories,
         'related_books': related_books,
-        'reviews': reviews
+        'reviews': reviews,
+        'cart_item_count': cart_item_count,
     }
     return render(request, 'sidebar.html', context)
 
@@ -183,50 +190,130 @@ def delete_user(request, id):
     return redirect('view_user')
 
 @login_required(login_url='account_login')
-
-@login_required(login_url='account_login')
 def sidebar(request, id):
     selected_category = get_object_or_404(Category, id=id)
     categories = Category.objects.all()
     books = Book.objects.filter(category=selected_category)  # Filter books based on the selected category
+    cart_item_count = Cart.objects.filter(user=request.user).count()
 
     context = {
         'selected_category': selected_category,
         'categories': categories,
         'books': books,
+        'cart_item_count': cart_item_count,
+
     }
 
     return render(request, 'display.html', context)
 
-# .....Buy now, cart... 
 
-@login_required(login_url='account_login')
-def add_to_cart(request,id):
-    user=User.objects.get(id=request.user.id)
-    book=Book.objects.get(id=id)
-    cart=Cart(user_id=user.id,book_id=book.id)
-    cart.save()
-    context={
-        'cart':cart
-    }
-    return render(request,'cart.html',context)
-
-# def viewcart(request):
-#     cart=Cart.objects.all()
+# @login_required(login_url='account_login')
+# def add_to_cart(request,id):
+#     user=User.objects.get(id=request.user.id)
+#     book=Book.objects.get(id=id)
+#     cart=Cart(user_id=user.id,book_id=book.id)
+#     cart.save()
 #     context={
 #         'cart':cart
 #     }
-#     return render(request,'viewcart.html',context)
+#     return render(request,'cart.html',context)
 
-@login_required(login_url='account_login')
-def delete_cart(request,id):
-    cart=Cart.objects.filter(id=id)
-    cart.delete()
-    return redirect("viewcart")
+
+# ......................ADD TO CART..................... 
+def addtocart(request):
+    if request.method == 'POST':
+        print(request.POST) 
+        book_id = request.POST.get('book_id')
+        book_qty = request.POST.get('book_qty')
+        
+        # Check if book_id and book_qty are present
+        if book_id is None or book_qty is None:
+            return JsonResponse({'status': 'Invalid request parameters'})
+        # Try to convert book_id and book_qty to integers
+        try:
+            book_id = int(book_id)
+            book_qty = int(book_qty)
+        except (ValueError, TypeError):
+            return JsonResponse({'status': 'Invalid request parameters'})
+
+        # Query the database for the book with the given book_id
+        book = get_object_or_404(Book, id=book_id)
+        cart_item_count = Cart.objects.filter(user=request.user).count()
+
+        context = {
+        'cart_item_count': cart_item_count,
+        # ... (other context data if any)
+    }
+
+        # Check if the requested quantity is available in stock
+        if book.stock >= book_qty:
+            # Check if the product is already in the cart
+            if Cart.objects.filter(user=request.user, book=book).exists():
+                return JsonResponse({'status': 'Product Already in Cart'})
+            else:
+                # Create a new cart item
+                Cart.objects.create(user=request.user, book=book, quantity=book_qty)
+
+                response_data = {
+                        'status': 'Product added successfully',
+                        'cart_item_count': cart_item_count,
+                }
+                return JsonResponse(response_data)
+        else:
+            return JsonResponse({'status': f'Only {book.stock} quantity available'})
+
+    # Invalid request method
+    return redirect(book_details)
+
+# .........................VIEW CART......................
+def viewcart(request):
+    cart=Cart.objects.filter(user=request.user)
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+    total_cost = Cart.total_cost_of_products(cart)
+    context={
+        'cart':cart,
+         'cart_item_count': cart_item_count,
+         'total_cost': total_cost
+    }
+    return render(request,'viewcart.html',context)
+
+
+# ...........................UPDATE CART....................
+def updatecart(request):
+    if request.method == 'POST' and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        book_id = int(request.POST.get('book_id'))
+        book_qty = int(request.POST.get('book_qty'))
+
+        # Get the Cart object for the given book and user
+        cart_item = get_object_or_404(Cart, user=request.user, book_id=book_id)
+
+        # Update the quantity and save the Cart object
+        cart_item.quantity = book_qty
+        cart_item.save()
+
+        return JsonResponse({'status': 'Updated successfully'})
+    else:
+        return JsonResponse({'status': 'Invalid request'})
+
+
+# ...........................DELETE CART....................
+def delete_cart_item(request, cart_item_id):
+    try:
+        cart_item = Cart.objects.get(id=cart_item_id, user=request.user)
+        cart_item.delete()
+        return JsonResponse({'status': 'success'})
+    except Cart.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Cart item not found'}, status=400)
+    except Exception as e:
+        print(e)  # Log the exception for debugging purposes
+        return JsonResponse({'status': 'error', 'message': 'Error deleting cart item'}, status=500)
+
+
+
 
 @login_required(login_url='user_login')
 def get_cart_data(request):
-    cart=Cart.objects.filter(user_id=request.user.id)
+    cart=Cart.objects.filter(user=request.user.id)
     price,items=0,0
     for i in cart :
         price=int(i.book.price)
@@ -238,48 +325,100 @@ def get_cart_data(request):
 
 
 # razor pay
-import razorpay
+# import razorpay
 
+
+# ...........................ORDER PAGE....................
 @login_required(login_url='account_login')
+def booking(request):
+    form = OrderModelForm()
+    order_placed = False
+    order = None
 
-def booking(request,id): 
-    # form=OrderModelForm()
-    user=User.objects.get(id=request.user.id)
-    book=Book.objects.get(id=id)
-    form=OrderModelForm(request.POST)
-    if request.method=='POST':
+    if request.method == 'POST':
+        form = OrderModelForm(request.POST)
         if form.is_valid():
-            order=form.save(commit=False)
-            order.user=User.objects.get(id=request.user.id)
-            order.book=Book.objects.get(id=book.id)   
-            print(order) 
-            order.status=False
-            order.save()      
-            return redirect('display')	
-    
-        client = razorpay.Client(auth=("rzp_test_tIYSGqIfPmDOgX", "8SLCoYyRitptnvJsazcwC4gG"))
-        DATA = {
-        "amount":'0',
-        "currency": "INR",
-        "receipt": "receipt#1",
-        "notes": {
-            "key1": "value3",
-            "key2": "value2"
-                }
-            }
-        client.order.create(data=DATA)
-    return render(request, 'booking.html', {"form": form})
+            order = form.save(commit=False)
+            order.user = request.user
+            order.status = False
+            order.tracking_no = str(uuid.uuid4().fields[-1])[:6].upper()
+
+            cart_items = Cart.objects.filter(user=request.user)
+            total_cost = Cart.total_cost_of_products(cart_items)
+            order.total_price = total_cost
+            order.save()
+            order_placed = True
+            messages.success(request, f"Order placed successfully! Your tracking number is {order.tracking_no}.")
+
+            # Create OrderItem instances for each item in the cart
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    book=cart_item.book,
+                    price=cart_item.book.price,
+                    quantity=cart_item.quantity
+                )
+
+            # Clear the cart after creating the order and order items
+            cart_items.delete()
+
+            return redirect('display')
+        else:
+            print('error', form.errors)
+
+    cart_items = Cart.objects.filter(user=request.user)
+    total_cost = Cart.total_cost_of_products(cart_items)
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+
+
+    return render(request, 'booking.html', {'form': form, 'cart_items': cart_items, 'total_cost': total_cost, 'order_placed': order_placed, 'order': order,'cart_item_count':cart_item_count})
 
 
 
-# .....order.....
+# def booking(request):
+#     cart_items = Cart.objects.filter(user=request.user)
+#     total_cost = Cart.total_cost_of_products(cart_items)
+#     return render(request, 'booking.html', {'cart_items': cart_items, 'total_cost': total_cost})
 
+
+  # client = razorpay.Client(auth=("rzp_test_tIYSGqIfPmDOgX", "8SLCoYyRitptnvJsazcwC4gG"))
+        # DATA = {
+        # "amount":'0',
+        # "currency": "INR",
+        # "receipt": "receipt#1",
+        # "notes": {
+        #     "key1": "value3",
+        #     "key2": "value2"
+        #         }
+        #     }
+        # client.order.create(data=DATA)
+
+# ...........................VIEW ORDER....................
 @login_required(login_url='account_login')
 def view_order(request):
-    myorder = Order.objects.filter(user_id= request.user.id)
-    return render(request, 'view_order.html', {"myorder": myorder})
+    orders=Order.objects.filter(user=request.user)
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+
+    return render(request, 'view_order.html', {"orders": orders,'cart_item_count':cart_item_count})
 
 
+# ...........................VIEW ORDERED ITEM....................
+def view_my_order(request, t_no):
+    order = get_object_or_404(Order, tracking_no=t_no, user=request.user)
+    order_items = OrderItem.objects.filter(order=order)
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+
+    context = {"order": order, "order_items": order_items,'cart_item_count':cart_item_count}
+    return render(request, 'view_order_details.html', context)
+
+
+# def view_my_order(request, t_no):
+#     order = get_object_or_404(Order, tracking_no=t_no, user=request.user)
+#     order_items = OrderItem.objects.filter(order=order)
+#     return render(request, 'view_order_details.html', {"order": order, "order_items": order_items})
+
+
+# ...........................ADMIN UPDATE ORDER ....................
 @login_required
 def update_order_view(request,id):
     order=Order.objects.get(id=id)
@@ -291,10 +430,20 @@ def update_order_view(request,id):
             return redirect('admin_view_booking')
     return render(request,'store/update_order.html',{'form':form})
 
+# ...........................ADMIN VIEW ORDER ....................
 def admin_view_booking(request):
     myorder = Order.objects.all()
+    # myorderitem=OrderItem.objects
     return render(request, 'admin-view-booking.html', {"myorder": myorder})
 
+# ...........................ADMIN VIEW ORDERITEM ....................
+def admin_view_orders(request,t_no):
+    order = get_object_or_404(Order, tracking_no=t_no)
+    order_items = OrderItem.objects.filter(order=order)
+    return render(request, 'admin_view_order.html', {"order": order, "order_items": order_items})
+
+
+# ...........................ADMIN DELETE ORDER ....................
 def delete_order(request,id):
     myorder=Order.objects.filter(id=id)
     myorder.delete()

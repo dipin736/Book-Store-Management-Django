@@ -1,3 +1,5 @@
+{% load static %}
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,11 +12,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
+    
     
     <style>
         body{ 
             /* background-image: url('https://wallpaperaccess.com/full/124383.jpg');  */
         }
+        body {
+    background-color: #eee;
+    font-family: 'Calibri', sans-serif !important;
+}
         .main-navbar{
     border-bottom: 1px solid #ccc;
 }
@@ -66,38 +75,6 @@
     </style>
   </head>
   <body>
-<!-- 
-    <nav class="navbar navbar-expand-sm navbar-dark  bg-danger">
-        <a class="navbar-brand" href="#" style="color: rgb(0, 0, 0);"> <i class="fa-sharp fa-solid fa-book"></i> BOOK ONLINE STORE</a>
-        <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId" aria-controls="collapsibleNavId"
-            aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavId">
-            <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'display' %}">Home</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'account_update'  %}">{{request.user.username}}</a>
-                </li>  
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'view_order' %}">MyOrder</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'request_books' %}">Request</a>
-                </li>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Search">
-                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-                </form>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'logoutuser' %}">Logout</a>
-                </li>
-            </ul>      
-        </div>
-    </nav>
-     -->
     <div class="main-navbar shadow-sm sticky-top">
         <div class="top-navbar bg-danger">
             <div class="container-fluid">
@@ -129,8 +106,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">
-                                    <i class="fa fa-shopping-cart"></i> Cart (0)
+                                <a class="nav-link" href="{% url 'cart' %}">
+                                    <i class="fa fa-shopping-cart"></i> Cart {% if cart_item_count > 0 %} ({{ cart_item_count }}) {% endif %}
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -149,7 +126,7 @@
                                 <li><a class="dropdown-item" href="{% url 'view_order' %}"><i class="fa fa-list"></i> My Orders</a></li>
                                 <li><a class="dropdown-item" href="{% url 'request_books' %}"><i class="fa fa-list"></i>Request</a></li> 
                                 <li><a class="dropdown-item" href="#"><i class="fa fa-heart"></i> My Wishlist</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fa fa-shopping-cart"></i> My Cart</a></li>
+                                <li><a class="dropdown-item" href="{% url 'cart' %}"><i class="fa fa-shopping-cart"></i> My Cart</a></li>
                                 <li><a class="dropdown-item" href="{% url 'logoutuser' %}"><i class="fa fa-sign-out"></i> Logout</a></li>
                                 </ul>
                             </li>
@@ -166,11 +143,20 @@
 {% endblock main %}
 
 
-
+    
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+    <script>
+        alertify.set('notifier','position', 'top-right');
+      {% for msg in messages %}
+            alertify.success('{{msg}}')
+      {% endfor %}
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   </body>

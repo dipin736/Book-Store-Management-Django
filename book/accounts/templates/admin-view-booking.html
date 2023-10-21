@@ -2,48 +2,73 @@
 {% load static %}
 
 {% block main %}
-
-<div class="cart_info bg-light">
-    <table class="table table-hover bg-light">
-        <thead class="text-center bg-light">
-            <tr>
-                <th scope="col">Order ID</th>
-                <th>Book title</th>
-                <th>Book image</th>
-                <th scope="col">Customer-Name</th>
-                <th scope="col">Email</th>
-                <th>Contact</th>
-                <th scope="col">Status</th>
-                <th scope="col">Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody class="text-center">
-            {% for i in myorder %}
-            <tr>
-                <td><a href="">#001{{ i.id }}</a></td>
-                <td>{{i.book.title}}</td>
-                <td><img src="/media/{{i.book.image}}" style="width:50px"/></td>
-                <td>{{ i.name }}</td>
-                <td>{{ i.email }}</td>
-                <td>{{i.mobile}}</td>
-                <td class="text-center bg-warning " style=" color:red;" >
-                    {% if i.status == True %}
-                    <p style="color: black; background-color:rgb(12, 243, 12); ">Confirmed</p>
-                    {% else %}
-                    <p style="color:red;background-color: black; ">Processing...</p>
-                    {% endif %}</td>
-                <td>{{ i.created_at }}</td>
-                <td>
-                    <a class="btn btn-primary btn-xs" href="{% url 'update_order_view' i.id  %}"><span><i class="fa-solid fa-pen-to-square"></i></span></a>
-                    <a href="{% url 'delete_order' i.id  %}"  class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
-            
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container-fluid my-3">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3>Admin View Order</h3>
+                    <div class="cart_info bg-light my-3">
+                        <table class="table table-bordered">
+                            <thead class="text-center">
+                                <tr>
+                                    <th scope="col">Tracking ID</th>
+                                    <th scope="col">Customer-Name</th>
+                                    <th scope="col">Email</th>
+                                    <th>Contact</th>
+                                    <th>Address</th>
+                                    <th scope="col">Order Date</th>
+                                    <th scope="col">Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-center">
+                                {% for i in myorder %}
+                                <tr>
+                                    <td>{{i.tracking_no}}</td>
+                                    <td>{{ i.name }}</td>
+                                    <td>{{ i.email }}</td>
+                                    <td>{{i.mobile}}</td>
+                                    <td>{{i.address}},
+                                        {{i.city}}
+                                    </td>
+                                    <td>{{ i.created_at }}</td>
+                                    <td class="text-center ">
+                                        {% if i.status == True %}
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                            
+                                            <span style="color: black; background-color:rgb(12, 243, 12); font-size: larger ;">Confirmed <img src="https://previews.123rf.com/images/th3fisa/th3fisa1309/th3fisa130900049/22574975-sticker-of-green-glossy-check-mark-with-light-shadow.jpg" alt="" style="width: 30px;"></span>
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger progress-bar-striped" role="progressbar"
+                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                               Processing....
+                                            </div>
+                                        </div>
+                                        
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-primary btn-xs" href="{% url 'update_order_view' i.id  %}"><span><i class="fa-solid fa-pen-to-square"></i></span></a>
+                                        <a href="{% url 'delete_order' i.id  %}"  class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
+                                        <a href="{% url 'admin_view_orders' i.tracking_no %}" class="btn btn-primary">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 
 

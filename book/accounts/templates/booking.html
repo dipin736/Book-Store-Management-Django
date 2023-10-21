@@ -7,40 +7,51 @@
 {% block main %}
  
 <div class="container">
+    <form action="{% url 'booking' %}" method="post" class="card p-3"  style="width: 100%;">
     <div class="row m-3">
-        <div class="col-md-8 bg">
-            <form action="" method="post" class="card p-3"  style="width: 100%;">
+        <div class="col-md-7 bg">
             <h3>Basic Details</h3>
 
                 {% csrf_token %}
                 <div class="m-3">
                     {{ form|crispy }}
                 </div>
-            </form>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <h2 class=" bg-light text-center">CHECKOUT</h2>
-                <table class="table bg-light" >
-                    <!-- <tr>
-                        <td>ITEM TOTAL</td>
-                        <td id="item_total"></td>
-                    </tr> -->
+               
+            <table class="table table-striped table-bordered">
+                <thead>
                     <tr>
-                        <td>ITEMS:</td>
-                        <td id="items"></td>
-                    </tr>                
-                    <tr>
-                        <td>DELIVERY</td>
-                        <td>FREE</td>
+                        <th>Book</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <!-- <th>Total Cost</th> -->
                     </tr>
-                    
-                    <tr>
-                        <td>GRAND TOTAL</td>
-                        <td id="grand_total"></td>
-                    </tr>
-                </table>
-            <button type="submit" class="btn btn-block btn-warning">
-                <form action="success" method="POST">
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                        <tr>
+                            <td>{{ item.book.title }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.total_cost  }}</td>
+                            <!-- <td>{{ item.total_cost }}</td> -->
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4">Your cart is empty</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-between">
+                <h6>Grand Total</h6>
+                <h6 class="text-end font-weight-bold ">Rs {{ total_cost|floatformat:2 }}</h6>
+            </div>
+            
+            <button type="submit" class="btn btn-block btn-warning w-100">
+                Place Order
+                <!-- <form action="success" method="POST">
                     <script
                         src="https://checkout.razorpay.com/v1/checkout.js"
                         data-key="rzp_test_tIYSGqIfPmDOgX" // Enter the Test API Key ID generated from Dashboard → Settings → API Keys
@@ -56,13 +67,14 @@
                         data-theme.color="#F37254"
                     ></script>
                     <input type="hidden" custom="Hidden Element" name="hidden"/>
-                    </form>
+                    </form> -->
             </button>
 
-            </div>
-
+        </div>
     </div>
-  
+    </form>
+
+</div>
     
     <script>
           function grandTotal(){

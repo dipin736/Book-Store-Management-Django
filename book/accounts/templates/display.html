@@ -8,54 +8,13 @@
 {% endblock script %}
     
 
-<div id="wrapper" class="container-fluid">
+<div id="wrapper" class="container-fluid" >
     <div class="row">
         <!-- Sidebar with categories -->
         <div class="col-md-2 bg-light pt-3">
             <div class="list-group p-3 mt-4">
                 <a href="{% url 'display' %}" class="list-group-item list-group-item-action bg-light">All Product</a>
-                    <div class="a-section a-spacing-none">
-                    <div class="a-section a-spacing-small">
-                      <span class="a-size-base a-color-base a-text-bold" dir="auto"
-                        >New Arrivals</span
-                      >
-                    </div>
-                    <ul class="a-unordered-list a-nostyle a-vertical a-spacing-medium">
-                      <li class="a-spacing-micro">
-                        <span class="a-list-item">
-                          <a
-                            class="a-link-normal"
-                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684819031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_0"
-                          >
-                            <span class="a-size-base a-color-base" dir="auto">Last 30 days</span>
-                          </a>
-                        </span>
-                      </li>
-                  
-                      <li class="a-spacing-micro">
-                        <span class="a-list-item">
-                          <a
-                            class="a-link-normal"
-                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684820031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_1"
-                          >
-                            <span class="a-size-base a-color-base" dir="auto">Last 90 days</span>
-                          </a>
-                        </span>
-                      </li>
-                  
-                      <li class="a-spacing-micro">
-                        <span class="a-list-item">
-                          <a
-                            class="a-link-normal"
-                            href="/s?bbn=91320524031&amp;rh=n%3A91320524031%2Cp_n_publication_date%3A2684821031&amp;dc&amp;qid=1697206730&amp;rnid=2684818031&amp;ref=lp_91320524031_nr_p_n_publication_date_2"
-                          >
-                            <span class="a-size-base a-color-base" dir="auto">Next 90 days</span>
-                          </a>
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                <span class="p-3">Selected Category: {{ selected_category.name | default:'0' }}</span>
+                <span class="p-3">Selected Category: {{ selected_category.name | default:'' }}</span>
                 {% for category in categories %}
                 <a href="{% url 'sidebar' id=category.id %}" class="list-group-item list-group-item-action bg-light p-3">{{ category.name }}</a>
                 {% endfor %}
@@ -63,11 +22,11 @@
         </div>
 
         <!-- Display books -->
-        <div class="col-md-10">
+        <div class="col-md-10" >
             <div class="row">
                 {% for i in books %}                   
                 <div class="col-md-3">
-                    <div class="card m-4" id="card">
+                    <div class="card m-4" id="card" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
                         <img class="p-2 mx-4" src="/media/{{i.image}}" id="img" alt="card-img">
                         <div class="card-body">
                             <h6 class="card-title"> {{i.title}} <br> Rs.{{i.price}} <small style="text-decoration: line-through;"> ₹699.00</small></h6>                           
@@ -84,8 +43,9 @@
                               <span class="{% if i.avg_rating %} orange-text{% endif %}" style="margin-right: 5px;">{{ i.avg_rating|floatformat:1|default:"" }}</span>
                               <span style="margin-right: 10px;">({{ i.num_reviews }})</span>
                           </div>
-                            <a href="{% url 'add_to_cart' i.id %}" class=" btn btn-warning">Add to Cart</a>
-                            <a href="{% url 'book_details' i.id %}" class="btn btn-info">View Book</a>
+                          <!-- <input type="text" value="{{i.id}}" name="" id=""> -->
+                          <a href="{% url 'book_details' i.id %}" class="btn btn-warning btn-block">View Book</a>
+
                         </div>
                     </div>
                 </div>

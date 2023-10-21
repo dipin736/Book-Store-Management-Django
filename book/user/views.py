@@ -13,20 +13,28 @@ from .filters import ProductFilter
 
 
 def account_login(request):
-    if request.method == 'GET':
-        return render(request,'user_login.html')
-    elif request.method == 'POST':
-        uname = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request,username=uname,password=password)
-        if user is not None:
-            login(request,user)
-            if user.is_superuser == True:
-                return redirect('admin_base')
+    # if request.method == 'GET':
+    #     return render(request,'user_login.html')
+    if request.user.is_authenticated:
+        messages.warning(request, "You are already logged in") 
+        return redirect('display')
+    else:
+        if request.method == 'POST':
+            uname = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(request,username=uname,password=password)
+            if user is not None:
+                login(request,user)
+                if user.is_superuser==True:
+                    # messages.success(request, "Logged in as admin.")
+                    return redirect('admin_base')
+                else:
+                    messages.success(request, "Welcome, you have successfully logged in.") 
+                    return redirect('display')
             else:
-               return redirect('display')
-        else:
-             messages.error(request, "Please Enter a valid username and password")
+                messages.error(request, "Please Enter a valid username and password")
+                return redirect('account_login')
+
         return render(request, "user_login.html")
     
 
@@ -60,6 +68,7 @@ def account_register(request):
 
 def logoutuser(request):
     logout(request)
+    messages.success(request, "Logout successfully .") 
     return redirect('account_login')
 
 @login_required(login_url='user_login')

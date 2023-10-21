@@ -1,90 +1,187 @@
-{% extends 'user_home.html' %}
+{% extends 'user_home.html' %} {% block main %}
 
-{% block main %}
+<style>
+  @import url(http://fonts.googleapis.com/css?family=Calibri:400,300,700);
 
-<div class="container-fluid">
-    <div class="row m-3 ">
-        <div class="col-md-8  table-hover  bg-light rounded ">
-                <table class="table ">
-                    <thead class="">
-                        <tr>
-                            <!-- <th>ID</th> -->
-                            <th>IMAGE</th>
-                            <th>CATEGORY</th>
-                            <th>TITLE</th>
-                            <th>AUTHOR</th>
-                            <th>PRICE</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        {% for i in cart  %}
-                    
-                        <tr>
-                            <!-- <td scope="row">{{i.book.id}}</td> -->
-                            <td><img src="/media/{{i.book.image}}" style="height:120px;width:160px;"/></td>
-                            <td>{{i.book.category}}</td>
-                            <td>{{i.book.title}}</td>
-                            <td>{{i.book.author}}</td>
-                            <td>{{i.book.price}}</td>
+  body {
+    background-color: #eee;
+    font-family: 'Calibri', sans-serif !important;
+  }
 
-                            <td ><a href="{% url 'delete_cart' i.id %}" class="btn btn-danger m-2"><i class="fa-solid fa-trash"></i></a></td>
-                        </tr>
-                       
-                        {% endfor %}
-    
-                    </tbody>
-                </table>
-                <div class="text-center m-3">
-                    <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue Shopping</a>
-                    <a href="" class="btn btn-primary">Proceed to Checkout  <i class="fa fa-forward"></i></a>
+  .mt-100 {
+    margin-top: 100px;
+
+  }
+
+
+  .card {
+    margin-bottom: 30px;
+    border: 0;
+    -webkit-transition: all .3s ease;
+    transition: all .3s ease;
+    letter-spacing: .5px;
+    border-radius: 8px;
+    -webkit-box-shadow: 1px 5px 24px 0 rgba(68, 102, 242, .05);
+    box-shadow: 1px 5px 24px 0 rgba(68, 102, 242, .05);
+  }
+
+  .card .card-header {
+    background-color: #fff;
+    border-bottom: none;
+    padding: 24px;
+    border-bottom: 1px solid #f6f7fb;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  .card-header:first-child {
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
+  }
+
+
+
+  .card .card-body {
+    padding: 30px;
+    background-color: transparent;
+  }
+
+  .btn-primary,
+  .btn-primary.disabled,
+  .btn-primary:disabled {
+    background-color: #4466f2 !important;
+    border-color: #4466f2 !important;
+  }
+</style>
+
+<div class="container">
+  <div class="row m-3 cartdata">
+    {% if cart %}
+    <div class="col-md-12 table-hover book_qty bg-light rounded">
+      <table class="table">
+        <thead class="">
+          <tr>
+            <!-- <th>ID</th> -->
+            <th>IMAGE</th>
+            <th>CATEGORY</th>
+            <th>UNIT</th>
+            <th>AUTHOR</th>
+            <th>QUANTITY</th>
+            <th>TOTAL PRICE</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in cart %}
+          <tr class="book_qty">
+            <!-- <td scope="row">{{i.book.id}}</td> -->
+            <td>
+              <img src="/media/{{i.book.image}}" style="height: 120px; width: 160px" />
+            </td>
+            <td>{{i.book.category}}</td>
+            <td>{{i.book.price | stringformat:'d'}}</td>
+            <td>{{i.book.author}}</td>
+            <td>
+              <div>
+                <input type="hidden" class="book_id" value="{{ i.book_id }}">
+                {% csrf_token %}
+                {% if i.book.stock > i.quantity %}
+                <div class="input-group text-center mb-3" style="width: 120px;">
+                  <button class="input-group-text changeQuantity decrement-btn">-</button>
+                  <input type="text" name="quantity" class="form-control text-center quantity-input" id=""
+                    value="{{ i.quantity }}">
+                  <button class="input-group-text changeQuantity increment-btn">+</button>
                 </div>
-        </div>
-        <div class="col-md-4">
-            <h2 class=" bg-light text-center">CHECKOUT</h2>
-            <table class="table bg-light" >
-                <!-- <tr>
-                    <td>ITEM TOTAL</td>
-                    <td id="item_total"></td>
-                </tr> -->
-                <tr>
-                    <td>ITEMS:</td>
-                    <td id="items"></td>
-                </tr>                
-                <tr>
-                    <td>DELIVERY</td>
-                    <td>FREE</td>
-                </tr>
-                
-                <tr>
-                    <td>GRAND TOTAL</td>
-                    <td id="grand_total"></td>
-                </tr>
-
-            </table>
-        </div>
+                {% else %}
+                <h6>out of stock</h6>
+                {% endif %}
+              </div>
+            </td>
+            <!-- <td>{{i.book.price}}</td> -->
+            <td>{{i.total_cost | stringformat:'d'}}</td>
+            <td>
+              <button class="btn btn-danger delete-cart-item-btn" data-cart-item-id="{{ i.id }}">Delete</button>
+            </td>
+          </tr>
+          {% endfor %}
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Total Amount</td>
+            <td colspan="5">{{ total_cost|stringformat:'d' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <div class="text-center m-3">
+        <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue
+          Shopping</a>
+        <a href="{% url 'booking' %}" class="btn btn-primary">Proceed to Checkout <i class="fa fa-forward"></i></a>
+      </div>
     </div>
+    {% else %}
+    <div class="container-fluid mt-100">
+      <div class="row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <!-- <h5>Cart</h5> -->
+            </div>
+            <div class="card-body cart">
+              <div class="col-sm-12 empty-cart-cls text-center">
+                <img src="https://i.imgur.com/dCdflKN.png" width="130" height="130" class="img-fluid mb-4 mr-3" />
+                <h3><strong>Your Cart is Empty</strong></h3>
+                <h4>Add something to make me happy :)</h4>
+                <a href="{% url 'display' %}" class="btn btn-primary cart-btn-transform m-3" data-abc="true">continue shopping</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+    <!-- <div class="col-md-4">
+      <h2 class="bg-light text-center">CHECKOUT</h2>
+      <table class="table bg-light">
+        <tr>
+          <td>ITEM TOTAL</td>
+          <td id="item_total">{{ total_cost | stringformat:'d' }} </td>
+        </tr>
+        <tr>
+          <td>ITEMS:</td>
+          <td id="items">{{i.quantity}}</td>
+        </tr>
+        <tr>
+          <td>DELIVERY</td>
+          <td>FREE</td>
+        </tr>
+
+        <tr>
+          <td>GRAND TOTAL</td>
+          <td id="grand_total"></td>
+        </tr>
+      </table>
+    </div> -->
+  </div>
+
 </div>
 
-<script>
-      function grandTotal(){
-           $.ajax({
-               url:"{% url 'get_cart_data' %}",
-               type:'get',
-               success:function(data){
-                //    $("#item_total").html(data.price)
-                    $("#items").html(data.items);
-                    $("#grand_total").html(data.price)
-
-               }
-           })
-       }
-       grandTotal();
-      
-
-
-</script>
-
+ <script>
+  function grandTotal() {
+    $.ajax({
+      url: "{% url 'get_cart_data' %}",
+      type: "get",
+      success: function (data) {
+        $("#item_total").html(data.price)
+        $("#items").html(data.items);
+        $("#grand_total").html(data.price);
+      },
+    });
+  }
+  grandTotal();
+</script> 
 
 {% endblock main %}

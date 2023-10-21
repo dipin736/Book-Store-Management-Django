@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{% static 'css/details.css' %}">
 
 <div class="container pt-5">
-  <div class="card center">
+  <div class="card center book_qty" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
     <div class="row no-gutters">
       <div class="col-md-4">
         <img src="{{ book.image.url }}" alt="{{ book.title }}" class="card-img">
@@ -21,15 +21,30 @@
           <h4 class="card-text text-success">Author: {{ book.author }}</h4>
           <p class="card-text new-price text-bold mb-1">Price: ₹{{ book.price }}</p>
           <!-- Add to Cart and Buy Now Buttons -->
-          <div class="buttons d-flex my-5">
-            <div class="block">
-              <a href="#" class="btn btn-warning custom-btn">Add to Cart</a>
+          <div class="row mt-2 block">
+            <div class="col-md-9">
+              {% csrf_token %}
+              {% if  book.stock > 0 %}
+                <div class="input-group text-center mb-3" style="width: 120px;">
+                  <input type="hidden" class="book_id" value="{{book.id}}">
+                    <button class="input-group-text decrement-btn">-</button>
+                    <input type="text" name="quantity" class="form-control text-center quantity-input" id="" value="1">
+                    <button class="input-group-text increment-btn">+</button>
+                  </div>
+                  <button class="btn btn-warning custom-btn add-to-cart-btn" data-book-id="{{ book.id }}"><i class="fa fa-shopping-cart"></i>Add to Cart</button>
+              {% else %}
+                <button class="btn btn-secondary"><i class="fa fa-minus"></i>Out of Stock</button>
+              {% endif %} 
+              <button class="btn btn-primary custom-btn"><i class="fa fa-heart"></i>Add to Wishlist</button>
+
             </div>
-            <div class="block">
-              <a href="{% url 'add_to_cart' id=book.id %}" class="btn btn-danger custom-btn">Buy Now</a>
-            </div>
+            <!-- <div class="col-md-3">
+              <button class="btn btn-primary custom-btn">Add to Wishlist</button>
+            </div> -->
+        </div>
+               
           </div>
-          <div class="row questions bg-light p-3">
+          <div class="row questions p-3">
             <div class="col-md-1 icon">
               <i class="fa-brands fa-rocketchat questions-icon"></i>
             </div>
@@ -38,7 +53,7 @@
               email.
             </div>
           </div>
-          <div class="delivery my-4">
+          <div class="delivery my-4 p-3">
             <p class="font-weight-bold mb-0"><span><i class="fa-solid fa-truck"></i></span> <b>Delivery done in 3 days
                 from date of purchase</b> </p>
             <p class="text-secondary">Order now to get this product delivery</p>
@@ -118,13 +133,6 @@
                   <label>Your message</label>
                   <textarea class="form-control" name="review_desp"  rows="10"></textarea>
                 </div>
-                <!-- <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <input type="text" name="" class="form-control" placeholder="Name*">
-                    </div>
-                  </div>
-                </div> -->
                 <button class="round-black-btn">Submit Review</button>
               </form>
             </div>
@@ -159,6 +167,57 @@
   });
 
 </script>
+
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+<!-- <script>
+  $(document).ready(function(){
+    $(".increment-btn").click(function(){
+        var quantityInput = $(this).closest('.book_qty').find(".quantity-input");
+        var currentValue = parseInt(quantityInput.val());
+        quantityInput.val(currentValue + 1);
+    });
+
+    $(".decrement-btn").click(function(){
+        var quantityInput = $(this).closest('.book_qty').find(".quantity-input");
+        var currentValue = parseInt(quantityInput.val());
+        if(currentValue > 1){
+            quantityInput.val(currentValue - 1);
+        }
+    });
+
+    $('.add-to-cart-btn').click(function (e){
+        e.preventDefault();
+
+        var book_id = $(this).closest('.book_qty').find(".book_id").val();
+        var book_qty = $(this).closest('.book_qty').find(".quantity-input").val();
+        var token=$('input[name=csrfmiddlewaretoken]').val();
+        console.log("Book ID:", book_id);
+        console.log("Quantity:", book_qty);
+
+        $.ajax({
+            method: "POST",
+            url: "/add-to-cart",
+            data: {
+                'book_id': book_id,
+                'book_qty': book_qty,
+                csrfmiddlewaretoken: token
+            },
+            dataType: "json",  // This ensures that jQuery parses the response as JSON
+            success: function(response) {
+                      // Check the response status and display a pop-up message accordingly
+                      alertify.success(response.status);
+            },
+            error: function(error) {
+                // Handle errors here
+                console.error(error);
+                alertify.error('Error occurred. Please try again later.');
+            }
+        });
+        
+
+    })
+});
+</script> -->
 
 
 {% endblock main %}
