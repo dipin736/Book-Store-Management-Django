@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .models import Category,Book,Cart,Order, review,OrderItem
+from .models import Category,Book,Cart,Order, review,OrderItem,Wishlist
 from .forms import BookModelForm,OrderModelForm,OrderForm
 from user.models import User
 from django.http import JsonResponse
@@ -148,10 +148,13 @@ def display(request):
     categories = Category.objects.all()
     books = Book.objects.annotate(avg_rating=Avg('review__rating'), num_reviews=Count('review'))
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
     context = {
         'categories': categories,
         'books': books,
         'cart_item_count': cart_item_count,
+        'wish_item_count': wish_item_count,
+
     }
     return render(request, 'display.html', context)
 
@@ -162,6 +165,10 @@ def book_details(request, id):
     reviews = review.objects.filter(book=book)
     related_books = Book.objects.filter(category=book.category).exclude(id=id)[:3]  # Exclude the current book from related books
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+      
+
+
     if request.method == 'POST':
         user = request.user
         star_rating = request.POST['rate']
@@ -180,6 +187,8 @@ def book_details(request, id):
         'related_books': related_books,
         'reviews': reviews,
         'cart_item_count': cart_item_count,
+        'wish_item_count': wish_item_count,
+
     }
     return render(request, 'sidebar.html', context)
 
@@ -195,12 +204,15 @@ def sidebar(request, id):
     categories = Category.objects.all()
     books = Book.objects.filter(category=selected_category)  # Filter books based on the selected category
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
 
     context = {
         'selected_category': selected_category,
         'categories': categories,
         'books': books,
         'cart_item_count': cart_item_count,
+        'wish_item_count': wish_item_count,
+
 
     }
 
@@ -238,12 +250,7 @@ def addtocart(request):
 
         # Query the database for the book with the given book_id
         book = get_object_or_404(Book, id=book_id)
-        cart_item_count = Cart.objects.filter(user=request.user).count()
-
-        context = {
-        'cart_item_count': cart_item_count,
-        # ... (other context data if any)
-    }
+       
 
         # Check if the requested quantity is available in stock
         if book.stock >= book_qty:
@@ -253,7 +260,8 @@ def addtocart(request):
             else:
                 # Create a new cart item
                 Cart.objects.create(user=request.user, book=book, quantity=book_qty)
-
+                cart_item_count = Cart.objects.filter(user=request.user).count()
+                request.session['cart_item_count'] = cart_item_count
                 response_data = {
                         'status': 'Product added successfully',
                         'cart_item_count': cart_item_count,
@@ -269,11 +277,15 @@ def addtocart(request):
 def viewcart(request):
     cart=Cart.objects.filter(user=request.user)
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+
     total_cost = Cart.total_cost_of_products(cart)
     context={
         'cart':cart,
          'cart_item_count': cart_item_count,
-         'total_cost': total_cost
+         'total_cost': total_cost,
+            'wish_item_count': wish_item_count,
+
     }
     return render(request,'viewcart.html',context)
 
@@ -398,8 +410,11 @@ def booking(request):
 def view_order(request):
     orders=Order.objects.filter(user=request.user)
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
 
-    return render(request, 'view_order.html', {"orders": orders,'cart_item_count':cart_item_count})
+
+    return render(request, 'view_order.html', {"orders": orders,'cart_item_count':cart_item_count,'wish_item_count': wish_item_count,
+})
 
 
 # ...........................VIEW ORDERED ITEM....................
@@ -448,4 +463,75 @@ def delete_order(request,id):
     myorder=Order.objects.filter(id=id)
     myorder.delete()
     return redirect("admin_view_booking")
+
+
+# .............WISHLIST........
+
+def wishlist(request):
+    wishlist=Wishlist.objects.filter(user=request.user)
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+    cart_item_count = Wishlist.objects.filter(user=request.user).count()
+
+
+    context={
+        'wishlist':wishlist,
+        'wish_item_count': wish_item_count,
+        'cart_item_count':  cart_item_count,
+
+
+    }
+
+    return render(request, 'wishlist.html',context)
+
+
+
+def addtowishlist(request):
+    if request.method == 'POST':
+        print(request.POST) 
+        book_id = request.POST.get('book_id')
+        pdt_check=Book.objects.get(id=book_id)
+    
+        
+        # Check if book_id and book_qty are present
+        if book_id is None :
+            return JsonResponse({'status': 'Invalid request parameters'})
+        # Try to convert book_id and book_qty to integers
+        try:
+            book_id = int(book_id)
+        except (ValueError, TypeError):
+            return JsonResponse({'status': 'Invalid request parameters'})
+
+        # Query the database for the book with the given book_id
+        book = get_object_or_404(Book, id=book_id)
+       
+
+        # Check if the requested quantity is available in stock
+        if pdt_check:
+            # Check if the product is already in the cart
+            if Wishlist.objects.filter(user=request.user, book=book).exists():
+                return JsonResponse({'status': 'Product Already in Wishlist'})
+            else:
+                # Create a new cart item
+                Wishlist.objects.create(user=request.user, book=book,)
+                wish_item_count = Wishlist.objects.filter(user=request.user).count()
+                response_data = {
+                        'status': 'Product added successfully',
+                        'wish_item_count': wish_item_count,
+                }
+                return JsonResponse(response_data)
+       
+    # Invalid request method
+    return redirect(book_details)
+
+def delete_wish_item(request, wish_item_id):
+    try:
+        wish_item = Wishlist.objects.get(id=wish_item_id, user=request.user)
+        wish_item.delete()
+        return JsonResponse({'status': 'success'})
+    except Wishlist.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Wishlist item not found'}, status=400)
+    except Exception as e:
+        print(e)  # Log the exception for debugging purposes
+        return JsonResponse({'status': 'error', 'message': 'Error deleting Wishlist item'}, status=500)
+
 

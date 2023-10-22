@@ -44,6 +44,32 @@
         });
 
     })
+
+    $('.add-to-wishlist').click(function (e) {
+    e.preventDefault();
+
+    var book_id = $(this).closest('.book_qty').find(".book_id").val();
+    var token = $('input[name=csrfmiddlewaretoken]').val();
+
+    $.ajax({
+        method: "POST",
+        url: "/add-to-wishlist",
+        data: {
+            'book_id': book_id,
+            csrfmiddlewaretoken: token
+        },
+        dataType: "json",
+        success: function(response) {
+            alertify.success(response.status);
+            $('.wish_item_count').text(response.wish_item_count);
+        },
+        error: function(error) {
+            console.error(error);
+            alertify.error('Error occurred. Please try again later.');
+        }
+    });
+});
+
     $('.delete-cart-item-btn').click(function(e) {
         e.preventDefault();
         var cartItemId = $(this).data('cart-item-id');
@@ -67,6 +93,38 @@
                     });
                 } else {
                     alertify.error('Error deleting cart item');
+                }
+            },
+            error: function(error) {
+                console.error('AJAX error:', error);
+                alertify.error('Error occurred. Please try again later.');
+            }
+        });
+    });
+
+    $('.delete-wish-item-btn').click(function(e) {
+        e.preventDefault();
+        var wishItemId = $(this).data('wish-item-id');
+        var book_id = $(this).closest('.book_qty').find(".book_id").val();
+        var token = $('input[name=csrfmiddlewaretoken]').val();
+        
+        $.ajax({
+            method: 'POST',
+            url: '/delete-from-wishlist/' + wishItemId + '/',
+            data: {
+                'book_id': book_id,
+                'csrfmiddlewaretoken': token
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    alertify.success('Wish item deleted successfully');
+                    
+                    // Refresh the cart data by reloading the specific element
+                    $('.wishdata').load(location.href + " .wishdata", function() {
+                        // Additional logic after cart data is refreshed, if needed
+                    });
+                } else {
+                    alertify.error('Error deleting wish item');
                 }
             },
             error: function(error) {

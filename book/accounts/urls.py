@@ -53,7 +53,11 @@ urlpatterns = [
     path('view-order/',view_order,name='view_order'),
     path('view-my-order/<str:t_no>/',view_my_order, name='view_my_order'),
 
+    # WISHLIST
 
+    path('wishlist/',wishlist,name='wishlist'),
+    path('add-to-wishlist',addtowishlist,name='addtowishlist'),
+    path('delete-from-wishlist/<int:wish_item_id>/',delete_wish_item, name='delete_wish_item'),     
 
 
 

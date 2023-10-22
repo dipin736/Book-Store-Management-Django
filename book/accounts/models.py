@@ -92,3 +92,9 @@ class  review(models.Model):
 
     def __str__(self):
         return f'{self.review_desp}'
+
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    created_at = models.DateField(auto_now_add=True)
