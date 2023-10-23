@@ -126,21 +126,3 @@ def delete_books(request, id):
     return redirect('requested_books')
 
 
-
-# def book_list(request):
-#     queryset = Book.objects.all()
-#     product_filter = ProductFilter(request.GET, queryset=queryset)
-#     queryset = product_filter.qs
-
-#     return render(request, 'book_list.html', {'filter': product_filter, 'books': queryset})
-
-from django.shortcuts import render
-from accounts.models import Book
-
-def search_books(request):
-    title_query = request.GET.get('title')
-    if title_query:
-        books = Book.objects.filter(title__icontains=title_query)
-    else:
-        books = Book.objects.all()
-    return render(request, 'book_list.html', {'books': books, 'query': title_query})

@@ -535,3 +535,25 @@ def delete_wish_item(request, wish_item_id):
         return JsonResponse({'status': 'error', 'message': 'Error deleting Wishlist item'}, status=500)
 
 
+def pdfajax(request):
+    # Filter books based on stock availability
+    available_books = Book.objects.filter(stock__gt=0).values_list('title', flat=True)
+    book_titles = list(available_books)
+    return JsonResponse(book_titles, safe=False)
+
+
+def search_books(request):
+    if request.method == 'POST':
+        searcheditem=request.POST.get('title')
+        if searcheditem =='':
+            return redirect(request.META.get("HTTP_REFERER"))
+        else:
+            book = Book.objects.filter(title=searcheditem).first()
+
+            if book:
+                return redirect('book_details',id=book.id)
+            else:
+                messages.info(request,'No Product Matched Your Search')
+                return redirect(request.META.get("HTTP_REFERER"))
+    return redirect(request.META.get("HTTP_REFERER"))
+

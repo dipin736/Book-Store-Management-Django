@@ -59,6 +59,10 @@ urlpatterns = [
     path('add-to-wishlist',addtowishlist,name='addtowishlist'),
     path('delete-from-wishlist/<int:wish_item_id>/',delete_wish_item, name='delete_wish_item'),     
 
+    path('pdfajax',pdfajax,name='pdfajax'),
+    path('search/', search_books, name='search_books'),
+
+
 
 
 

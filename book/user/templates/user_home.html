@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
     
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     
     <style>
         body{ 
@@ -75,7 +76,7 @@
     </style>
   </head>
   <body>
-    <div class="main-navbar shadow-sm sticky-top">
+    <div class="main-navbar ">
         <div class="top-navbar bg-danger">
             <div class="container-fluid">
                 <div class="row">
@@ -84,15 +85,23 @@
                             <a class="navbar-brand" href="{% url 'display' %}" style="color: wheat;"> <i class="fa-sharp fa-solid fa-book"></i> BOOK ONLINE STORE</a>
                         </h5>
                     </div>
-                    <div class="col-md-5 my-auto">
-                        <form  method="get" action="{% url 'search_books' %}" role="search ">
-                            <div class="input-group">
-                                <input type="search" name="title" placeholder="Search your product" class="form-control" required />
+                    <div class="col-md-5 ">
+                        <form  method="POST" action="{% url 'search_books' %}" role="search ">
+                            {% csrf_token %}
+                            <div class="input-group ">
+                                <input type="search" id="tags" name="title" placeholder="Search your product" class="form-control" required />
                                 <button class="btn bg-white" type="submit">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </div>
                         </form>
+                        <!-- <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <input type="text" id="tags" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                              <button class="input-group-text" id="basic-addon1">@</button>
+                            </div>
+                          </div>
+                           -->
                         <!-- <form method="get" action="{% url 'search_books' %}">
                             <input type="search" name="title" placeholder="Search your product" />
                             <button type="submit">Search</button>
@@ -155,7 +164,32 @@
 
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{% static 'js/script.js' %}"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script>
+
+    var availableTags = [ ];
+
+    $.ajax({
+        method: "GET",
+        url: "/pdfajax",
+        success: function (response) {
+            console.log(response); // Basic log message
+            startAutocomplete(response)
+         
+        }
+    });
+
+    function  startAutocomplete(availableTags){
+
+        $("#tags").autocomplete({
+            source: availableTags
+        });
+    }
+
+
+
+        </script>
+
     <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
