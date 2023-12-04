@@ -1,7 +1,7 @@
 from django.db import models
 from user.models import User
 from django.utils import timezone
-
+from django.core.validators import MinValueValidator
 # Create your models here.
 
 class Category(models.Model):
@@ -9,20 +9,25 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    class Meta:
+        ordering=['name']
 
 class Book(models.Model):
     category=models.ForeignKey(Category,on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=100)
     image=models.FileField(max_length=100,upload_to='Upload', null=True, blank=True)
     author = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # Use DecimalField for price
-    stock = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2 ,validators=[MinValueValidator(1)])  # Use DecimalField for price
+    stock = models.IntegerField(default=0,validators=[MinValueValidator(1)])
     description = models.TextField(null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
+    
+    class Meta:
+        ordering=['title']
     
 class Cart(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True)
