@@ -190,7 +190,7 @@ def book_details(request, id):
         'wish_item_count': wish_item_count,
 
     }
-    return render(request, 'sidebar.html', context)
+    return render(request, 'book_details.html', context)
 
 @login_required(login_url='account_login')
 def delete_user(request, id):
@@ -311,10 +311,12 @@ def updatecart(request):
 # ...........................DELETE CART....................
 def delete_cart_item(request, cart_item_id):
     try:
+        print(f'Deleting cart item {cart_item_id}')
         cart_item = Cart.objects.get(id=cart_item_id, user=request.user)
         cart_item.delete()
         return JsonResponse({'status': 'success'})
     except Cart.DoesNotExist:
+        print('Cart item not found')
         return JsonResponse({'status': 'error', 'message': 'Cart item not found'}, status=400)
     except Exception as e:
         print(e)  # Log the exception for debugging purposes
@@ -477,25 +479,25 @@ def wishlist(request):
         'wishlist':wishlist,
         'wish_item_count': wish_item_count,
         'cart_item_count':  cart_item_count,
-
-
     }
-
     return render(request, 'wishlist.html',context)
 
 
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Book, Wishlist
+
 def addtowishlist(request):
     if request.method == 'POST':
-        print(request.POST) 
+        # Retrieve book_id from the form data
         book_id = request.POST.get('book_id')
-        pdt_check=Book.objects.get(id=book_id)
-    
-        
-        # Check if book_id and book_qty are present
-        if book_id is None :
+
+        # Check if book_id is present
+        if book_id is None:
             return JsonResponse({'status': 'Invalid request parameters'})
-        # Try to convert book_id and book_qty to integers
+
+        # Try to convert book_id to an integer
         try:
             book_id = int(book_id)
         except (ValueError, TypeError):
@@ -503,25 +505,23 @@ def addtowishlist(request):
 
         # Query the database for the book with the given book_id
         book = get_object_or_404(Book, id=book_id)
-       
 
-        # Check if the requested quantity is available in stock
-        if pdt_check:
-            # Check if the product is already in the cart
-            if Wishlist.objects.filter(user=request.user, book=book).exists():
-                return JsonResponse({'status': 'Product Already in Wishlist'})
-            else:
-                # Create a new cart item
-                Wishlist.objects.create(user=request.user, book=book,)
-                wish_item_count = Wishlist.objects.filter(user=request.user).count()
-                response_data = {
-                        'status': 'Product added successfully',
-                        'wish_item_count': wish_item_count,
-                }
-                return JsonResponse(response_data)
-       
+        # Check if the product is already in the wishlist
+        if Wishlist.objects.filter(user=request.user, book=book).exists():
+            return JsonResponse({'status': 'Product Already in Wishlist'})
+        else:
+            # Create a new wishlist item
+            Wishlist.objects.create(user=request.user, book=book)
+            wish_item_count = Wishlist.objects.filter(user=request.user).count()
+            response_data = {
+                'status': 'Product added successfully',
+                'wish_item_count': wish_item_count,
+            }
+            return JsonResponse(response_data)
+
     # Invalid request method
-    return redirect(book_details)
+    return JsonResponse({'status': 'Invalid request method'})
+
 
 def delete_wish_item(request, wish_item_id):
     try:

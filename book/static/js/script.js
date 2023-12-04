@@ -72,9 +72,11 @@
 
     $('.delete-cart-item-btn').click(function(e) {
         e.preventDefault();
+        console.log('Delete button clicked');
         var cartItemId = $(this).data('cart-item-id');
         var book_id = $(this).closest('.book_qty').find(".book_id").val();
         var token = $('input[name=csrfmiddlewaretoken]').val();
+        console.log('CSRF Token:', token);
         
         $.ajax({
             method: 'POST',
