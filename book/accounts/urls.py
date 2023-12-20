@@ -63,6 +63,9 @@ urlpatterns = [
     path('search/', search_books, name='search_books'),
 
 
+    path('proceed-to-pay', razorpaycheck),
+
+
 
 
 

@@ -1,7 +1,10 @@
+from django.conf import settings
 from django.shortcuts import render,redirect,HttpResponse,get_object_or_404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+
 from .models import Category,Book,Cart,Order, review,OrderItem,Wishlist
 from .forms import BookModelForm,OrderModelForm,OrderForm
 from user.models import User
@@ -10,6 +13,8 @@ from django.core.mail import send_mail
 from django.db.models import Avg, Count
 import uuid
 from django.contrib import messages
+
+
 # Create your views here.
 
 # .....HOME/HEADER/FOOTER .............. starts
@@ -17,20 +22,38 @@ def home(request):
     return render(request, 'base.html')
 def about(request):
     return render(request, 'shared/about.html')
+
+
 def contact(request):
-    if request.method=='POST':
-        message_name=request.POST['name']
-        message_email=request.POST['email']
-        message=request.POST['message']
+    if request.method == 'POST':
+        message_name = request.POST['name']
+        message_email = request.POST['email']
+        user_message = request.POST['message']
+
+        # Customize the email message format
+        email_subject = f'Message from {message_name}'
+        email_message = f'''
+        You have received a new message from the contact form:
+
+        Name: {message_name}
+        Email: {message_email}
+
+        Message:
+        {user_message}
+        '''
+
         send_mail(
-            message_name,
-            message,
-            message_email,
-            ['dipinkarunakaran6@gmail.com'],
+            email_subject,
+            email_message,
+            settings.EMAIL_HOST_USER,  # Sender's email
+            [message_email],  # Recipient's email
+            fail_silently=False
         )
         return render(request, 'shared/contact.html')
     else:
-       return render(request, 'shared/contact.html')
+        return render(request, 'shared/contact.html')
+
+
     
 # .....HOME/HEADER/FOOTER.............. end
 
@@ -338,12 +361,12 @@ def get_cart_data(request):
     return JsonResponse(res)
 
 
-# razor pay
-# import razorpay
 
 
 # ...........................ORDER PAGE....................
+from django.views.decorators.csrf import csrf_protect
 @login_required(login_url='account_login')
+@csrf_protect
 def booking(request):
     form = OrderModelForm()
     order_placed = False
@@ -364,7 +387,9 @@ def booking(request):
             order_placed = True
             messages.success(request, f"Order placed successfully! Your tracking number is {order.tracking_no}.")
 
-            # Create OrderItem instances for each item in the cart
+            if order.payment_method == 'Pay by Razor Pay':
+                return JsonResponse({'status': "Your order has been successfully"})
+
             for cart_item in cart_items:
                 OrderItem.objects.create(
                     order=order,
@@ -373,7 +398,6 @@ def booking(request):
                     quantity=cart_item.quantity
                 )
 
-            # Clear the cart after creating the order and order items
             cart_items.delete()
 
             return redirect('display')
@@ -383,29 +407,37 @@ def booking(request):
     cart_items = Cart.objects.filter(user=request.user)
     total_cost = Cart.total_cost_of_products(cart_items)
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+
+    return render(request, 'booking.html', {
+        'form': form,
+        'cart_items': cart_items,
+        'total_cost': total_cost,
+        'order_placed': order_placed,
+        'order': order,
+        'cart_item_count': cart_item_count,
+        'wish_item_count': wish_item_count
+    })
+
+# razor pay
+import razorpay
 
 
-    return render(request, 'booking.html', {'form': form, 'cart_items': cart_items, 'total_cost': total_cost, 'order_placed': order_placed, 'order': order,'cart_item_count':cart_item_count})
+def razorpaycheck(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total_cost=0
+    for item in cart_items:
+        total_cost = total_cost + item.book.price*item.quantity
+
+    razorpay_key = settings.RAZORPAY_ID
+
+    return JsonResponse({
+        "total_cost":total_cost,
+        "razorpay_key": razorpay_key
+    })
 
 
 
-# def booking(request):
-#     cart_items = Cart.objects.filter(user=request.user)
-#     total_cost = Cart.total_cost_of_products(cart_items)
-#     return render(request, 'booking.html', {'cart_items': cart_items, 'total_cost': total_cost})
-
-
-  # client = razorpay.Client(auth=("rzp_test_tIYSGqIfPmDOgX", "8SLCoYyRitptnvJsazcwC4gG"))
-        # DATA = {
-        # "amount":'0',
-        # "currency": "INR",
-        # "receipt": "receipt#1",
-        # "notes": {
-        #     "key1": "value3",
-        #     "key2": "value2"
-        #         }
-        #     }
-        # client.order.create(data=DATA)
 
 # ...........................VIEW ORDER....................
 @login_required(login_url='account_login')

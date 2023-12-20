@@ -58,8 +58,8 @@
 <div class="container pt-4">
     <div class="row m-3 cartdata">
         {% if wishlist %}
-        <div class="col-md-12 table-hover book_qty bg-light rounded" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
-            <table class="table">
+        <div class="col-md-12 book_qty  table-responsive bg-light rounded" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
+            <table class="table bordered">
                 <thead class="">
                     <tr>
                         <!-- <th>ID</th> -->
@@ -76,7 +76,7 @@
                     <tr class="book_qty">
                         <!-- <td scope="row">{{i.book.id}}</td> -->
                         <td>
-                            <img src="/media/{{i.book.image}}" style="height: 120px; width: 160px" />
+                            <img src="/media/{{i.book.image}}" style="max-height: 120px; max-width: 160px" class="img-fluid" />
                         </td>
                         <td>{{i.book.category}}</td>
                         <td>{{i.book.price | stringformat:'d'}}</td>
@@ -85,7 +85,7 @@
                             <div>
                                 <input type="hidden" class="book_id" value="{{ i.book_id }}">
                                 {% csrf_token %}
-                               <a href="{% url 'book_details' i.book.id %}" class="btn btn-primary">View Book</a>
+                                <a href="{% url 'book_details' i.book.id %}" class="btn btn-primary">View Book</a>
                             </div>
                         </td>
                         <td>
@@ -94,7 +94,6 @@
                         </td>
                     </tr>
                     {% endfor %}
-              
                 </tbody>
             </table>
 
@@ -115,7 +114,7 @@
                                 <h3><strong>Your Wishlist is Empty</strong></h3>
                                 <h4>Add something to make me happy :)</h4>
                                 <a href="{% url 'display' %}" class="btn btn-primary cart-btn-transform m-3"
-                                    data-abc="true">continue shopping</a>
+                                    data-abc="true">Continue Shopping</a>
                             </div>
                         </div>
                     </div>
@@ -123,10 +122,78 @@
             </div>
         </div>
         {% endif %}
-
     </div>
 </div>
 
 
 
 {% endblock main %}
+
+
+<!-- 
+<div class="container pt-4">
+    <div class="row m-3 cartdata">
+        {% if wishlist %}
+        <div class="col-md-12 book_qty bg-light rounded" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>IMAGE</th>
+                        <th>CATEGORY</th>
+                        <th>UNIT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in wishlist %}
+                    <tr>
+                        <td>
+                            <img src="/media/{{i.book.image}}" style="max-height: 120px; max-width: 160px" class="img-fluid" />
+                        </td>
+                        <td>
+                            <strong>CATEGORY:</strong> {{i.book.category}}<br>
+                            <strong>UNIT:</strong> {{i.book.price | stringformat:'d'}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <strong>AUTHOR:</strong> {{i.book.author}}<br>
+                            <div>
+                                <input type="hidden" class="book_id" value="{{ i.book_id }}">
+                                {% csrf_token %}
+                                <a href="{% url 'book_details' i.book.id %}" class="btn btn-primary">View Book</a>
+                                <button class="btn btn-danger delete-wish-item-btn" data-wish-item-id="{{ i.id }}">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-center m-3">
+                <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue Shopping</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="container-fluid mt-100">
+            <div class="row">
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                        </div>
+                        <div class="card-body cart">
+                            <div class="col-sm-12 empty-cart-cls text-center">
+                                <h3><strong>Your Wishlist is Empty</strong></h3>
+                                <h4>Add something to make me happy :)</h4>
+                                <a href="{% url 'display' %}" class="btn btn-primary cart-btn-transform m-3"
+                                    data-abc="true">Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+ -->
