@@ -5,7 +5,9 @@
 {% block main %}
 
 <link rel="stylesheet" href="{% static 'css/details.css' %}">
-
+<div class="card-header">
+      <a href="{% url 'display' %}" class="btn btn-warning text-white"><i class="fa fa-reply"></i>Back</a>
+</div>
 <div class="container pt-5">
   <div class="card center book_qty" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
     <div class="row no-gutters">
@@ -14,51 +16,55 @@
       </div>
       <div class="col-md-8">
         <div class="card-body">
-          <div class="category text-bold">
-            Category:{{categories}}
-          </div>
-          <h5 class="card-title product-title text-bold my-3">{{ book.title }}</h5>
-          <h4 class="card-text text-success">Author: {{ book.author }}</h4>
-          <p class="card-text new-price text-bold mb-1">Price: ₹{{ book.price }}</p>
-          <!-- Add to Cart and Buy Now Buttons -->
-          <div class="row mt-2 block">
-            <div class="col-md-9">
-              {% csrf_token %}
-              {% if  book.stock > 0 %}
-                <div class="input-group text-center mb-3" style="width: 120px;">
-                  <input type="hidden" class="book_id" value="{{book.id}}">
-                    <button class="input-group-text decrement-btn">-</button>
-                    <input type="text" name="quantity" class="form-control text-center quantity-input" id="" value="1">
-                    <button class="input-group-text increment-btn">+</button>
-                  </div>
-                  <button class="btn btn-warning custom-btn add-to-cart-btn" data-book-id="{{ book.id }}"><i class="fa fa-shopping-cart"></i>Add to Cart</button>
-              {% else %}
-                <button class="btn btn-secondary"><i class="fa fa-minus"></i>Out of Stock</button>
-              {% endif %} 
-              <button class="btn btn-primary add-to-wishlist custom-btn"><i class="fa fa-heart"></i>Add to Wishlist</button>
-
+            <div class="category text-bold">
+                Category: {{ categories }}
             </div>
-            <!-- <div class="col-md-3">
-              <button class="btn btn-primary custom-btn">Add to Wishlist</button>
-            </div> -->
+            <h5 class="card-title product-title text-bold my-3">{{ book.title }}</h5>
+            <h4 class="card-text text-success">Author: {{ book.author }}</h4>
+            <p class="card-text new-price text-bold mb-1">Price: ₹{{ book.price }}</p>
+            <!-- Add to Cart and Buy Now Buttons -->
+            <div class="row mt-2 block">
+                <div class="col-md-9">
+                    {% csrf_token %}
+                    <div class="input-group text-center mb-3" style="width: 160px;">
+                      <input type="hidden" class="book_id" value="{{book.id}}">
+                      {% if  book.stock > 0 %}
+                        <button class="input-group-text decrement-btn">-</button>
+                        <input type="text" name="quantity" class="form-control text-center quantity-input" value="1">
+                        <button class="input-group-text increment-btn">+</button>
+                    </div>
+                        <button class="btn btn-warning custom-btn add-to-cart-btn" data-book-id="{{ book.id }}"><i
+                                class="fa fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    {% else %}
+                        <button class="btn btn-secondary m-2" disabled><i class="fa fa-minus"></i> Out of Stock</button>
+                    {% endif %}
+                    <button class="btn btn-primary add-to-wishlist custom-btn m-1"><i class="fa fa-heart"></i> Add to Wishlist
+                    </button>
+                </div>
+                <!-- </div> Remove this div -->
+                <!-- <div class="col-md-3">
+                    <button class="btn btn-primary custom-btn">Add to Wishlist</button>
+                </div> -->
+            </div>
+    
+            <div class="row questions p-3">
+                <div class="col-md-1 icon">
+                    <i class="fa-brands fa-rocketchat questions-icon"></i>
+                </div>
+                <div class="col-md-11 text">
+                    Have a question about our products at E-Store? Feel free to contact our representatives via live chat or
+                    email.
+                </div>
+            </div>
+            <div class="delivery my-4 p-3">
+                <p class="font-weight-bold mb-0"><span><i class="fa-solid fa-truck"></i></span> <b>Delivery done in 3 days
+                        from date of purchase</b></p>
+                <p class="text-secondary">Order now to get this product delivery</p>
+            </div>
         </div>
-               
-          </div>
-          <div class="row questions p-3">
-            <div class="col-md-1 icon">
-              <i class="fa-brands fa-rocketchat questions-icon"></i>
-            </div>
-            <div class="col-md-11 text">
-              Have a question about our products at E-Store? Feel free to contact our representatives via live chat or
-              email.
-            </div>
-          </div>
-          <div class="delivery my-4 p-3">
-            <p class="font-weight-bold mb-0"><span><i class="fa-solid fa-truck"></i></span> <b>Delivery done in 3 days
-                from date of purchase</b> </p>
-            <p class="text-secondary">Order now to get this product delivery</p>
-          </div>
-        </div>
+    </div>
+    
       </div>
       <div class="col-md-12">
         <div class="product-info-tabs">

@@ -1,21 +1,30 @@
 {% extends 'user_home.html' %}
 
 {% block main %}
-    
-<div class="container bg-light my-5 p-5">
-    <div class="bg-light p-3">
-        <h1 class="text-primary">Request For A Book</h1>
-    </div>
-    <form action="" method="post" class="p-2">
-         {% csrf_token %}
-         <input type="text" name="book_name" id="book_name" placeholder="Book Name">
-
-         <input type="text" name="author" id="author" placeholder="Book Author">
-        
-         <button type="submit" class="btn btn-primary btn-sm">Submit</button>
-
-    </form>     
+<div class="card-header">
+    <a href="{% url 'display' %}" class="btn btn-warning text-white"><i class="fa fa-reply"></i>Back</a>
 </div>
 
+<div class="container my-5 p-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8 bg-light p-3">
+            <h1 class="text-primary text-center">Request For a Book</h1>
+            <form action="" method="post" class="p-2">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="book_name" class="form-label">Book Name</label>
+                    <input type="text" name="book_name" id="book_name" class="form-control" placeholder="Book Name">
+                </div>
+
+                <div class="mb-3">
+                    <label for="author" class="form-label">Book Author</label>
+                    <input type="text" name="author" id="author" class="form-control" placeholder="Book Author">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
    
 {% endblock main %}

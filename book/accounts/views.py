@@ -456,8 +456,10 @@ def view_my_order(request, t_no):
     order = get_object_or_404(Order, tracking_no=t_no, user=request.user)
     order_items = OrderItem.objects.filter(order=order)
     cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
 
-    context = {"order": order, "order_items": order_items,'cart_item_count':cart_item_count}
+
+    context = {"order": order, "order_items": order_items,'cart_item_count':cart_item_count,'wish_item_count':wish_item_count}
     return render(request, 'view_order_details.html', context)
 
 
@@ -504,7 +506,7 @@ def delete_order(request,id):
 def wishlist(request):
     wishlist=Wishlist.objects.filter(user=request.user)
     wish_item_count = Wishlist.objects.filter(user=request.user).count()
-    cart_item_count = Wishlist.objects.filter(user=request.user).count()
+    cart_item_count = Cart.objects.filter(user=request.user).count()
 
 
     context={

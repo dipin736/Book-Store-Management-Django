@@ -51,59 +51,112 @@
         background-color: #4466f2 !important;
         border-color: #4466f2 !important;
     }
+    @media only screen and (max-width: 800px) {
+            /* Force table to not be like tables anymore */
+            #responsive-wishlist-table table,
+            #responsive-wishlist-table thead,
+            #responsive-wishlist-table tbody,
+            #responsive-wishlist-table th,
+            #responsive-wishlist-table td,
+            #responsive-wishlist-table tr {
+                display: block;
+            }
+
+            /* Hide table headers (but not display: none;, for accessibility) */
+            #responsive-wishlist-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            #responsive-wishlist-table tr {
+                border: 1px solid #ccc;
+            }
+
+            #responsive-wishlist-table td {
+                /* Behave like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 50%;
+                white-space: normal;
+                text-align: left;
+            }
+
+            #responsive-wishlist-table td:before {
+                /* Now like a table header */
+                position: absolute;
+                /* Top/left values mimic padding */
+                top: 6px;
+                left: 6px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+            }
+
+            /* Label the data */
+            #responsive-wishlist-table td:before {
+                content: attr(data-title);
+            }
+        }
+    
 </style>
 
-
+<div class="card-header">
+    <a href="{% url 'display' %}" class="btn btn-warning text-white"><i class="fa fa-reply"></i>Back</a>
+</div>
 <!-- {{wishlist}}    -->
 <div class="container pt-4">
     <div class="row m-3 cartdata">
         {% if wishlist %}
-        <div class="col-md-12 book_qty  table-responsive bg-light rounded" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
-            <table class="table bordered">
-                <thead class="">
-                    <tr>
-                        <!-- <th>ID</th> -->
-                        <th>IMAGE</th>
-                        <th>CATEGORY</th>
-                        <th>UNIT</th>
-                        <th>AUTHOR</th>
-                        <th>VIEW</th>
-                        <th>ACTION</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for i in wishlist %}
-                    <tr class="book_qty">
-                        <!-- <td scope="row">{{i.book.id}}</td> -->
-                        <td>
-                            <img src="/media/{{i.book.image}}" style="max-height: 120px; max-width: 160px" class="img-fluid" />
-                        </td>
-                        <td>{{i.book.category}}</td>
-                        <td>{{i.book.price | stringformat:'d'}}</td>
-                        <td>{{i.book.author}}</td>
-                        <td>
-                            <div>
-                                <input type="hidden" class="book_id" value="{{ i.book_id }}">
-                                {% csrf_token %}
-                                <a href="{% url 'book_details' i.book.id %}" class="btn btn-primary">View Book</a>
-                            </div>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger delete-wish-item-btn"
-                                data-wish-item-id="{{ i.id }}">Delete</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="col-md-12 book_qty  table-responsive bg-light rounded"
+        style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
+        <table class="mt-2 table table-bordered" id="responsive-wishlist-table">
+            <thead class="">
+                <tr>
+                    <th>IMAGE</th>
+                    <th>CATEGORY</th>
+                    <th>UNIT</th>
+                    <th>AUTHOR</th>
+                    <th>VIEW</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in wishlist %}
+                <tr class="book_qty">
+                    <td data-title="IMAGE">
+                        <img src="/media/{{i.book.image}}" style="max-height: 120px; max-width: 160px"
+                            class="img-fluid" />
+                    </td>
+                    <td data-title="CATEGORY">{{i.book.category}}</td>
+                    <td data-title="UNIT">{{i.book.price | stringformat:'d'}}</td>
+                    <td data-title="AUTHOR">{{i.book.author}}</td>
+                    <td data-title="VIEW">
+                        <div>
+                            <input type="hidden" class="book_id" value="{{ i.book_id }}">
+                            {% csrf_token %}
+                            <a href="{% url 'book_details' i.book.id %}" class="btn btn-primary">View Book</a>
+                        </div>
+                    </td>
+                    <td data-title="ACTION">
+                        <button class="btn btn-danger delete-wish-item-btn" data-wish-item-id="{{ i.id }}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-            <div class="text-center m-3">
-                <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue
-                    Shopping</a>
-            </div>
+        <div class="text-center m-3">
+            <a href="{% url 'display' %}" class="btn btn-success m-3"><i class="fa-solid fa-backward"></i>Continue
+                Shopping</a>
         </div>
+    </div>
+
         {% else %}
-        <div class="container-fluid mt-100">
+        <div class="container-fluid mt-50">
             <div class="row">
                 <div class="col">
                     <div class="card">
@@ -111,6 +164,7 @@
                         </div>
                         <div class="card-body cart">
                             <div class="col-sm-12 empty-cart-cls text-center">
+                                <img src="https://cdn-icons-png.flaticon.com/512/4379/4379561.png" width="130" height="130" class="img-fluid mb-4 mr-3" />
                                 <h3><strong>Your Wishlist is Empty</strong></h3>
                                 <h4>Add something to make me happy :)</h4>
                                 <a href="{% url 'display' %}" class="btn btn-primary cart-btn-transform m-3"

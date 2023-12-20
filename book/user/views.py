@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from .models import User,Request_Book
 from .forms import UserForm
-from accounts.models import Book,Category
+from accounts.models import Book, Cart,Category, Wishlist
 from django.contrib.auth.decorators import login_required
 from .filters import ProductFilter
 
@@ -86,13 +86,20 @@ def userprofile(request):
 @login_required(login_url='account_login')
 def account_update(request):
     user = User.objects.get(id=request.user.id)
+
+    # Calculate counts
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+
     if request.method == 'GET':
         context = {
-            'form':UserForm(instance=user)
+            'form': UserForm(instance=user),
+            'cart_item_count': cart_item_count,
+            'wish_item_count': wish_item_count,
         }
-        return render(request,'update.html',context)
+        return render(request, 'update.html', context)
     elif request.method == 'POST':
-        userform = UserForm(request.POST,request.FILES,instance=user)
+        userform = UserForm(request.POST, request.FILES, instance=user)
         if userform.is_valid():
             obj = userform.save(commit=False)
             obj.user_type = 'user'
@@ -100,21 +107,36 @@ def account_update(request):
             obj.save()
             return redirect('display')
         else:
-            context={
-                'form':userform
+            context = {
+                'form': userform,
+                'cart_item_count': cart_item_count,
+                'wish_item_count': wish_item_count,
             }
-            return render(request,'upd.html',context)
+            return render(request, 'update.html', context)
         
 
 def request_books(request):
-    if request.method=="POST":
+    if request.method == "POST":
         user = request.user
-        book_name = request.POST['book_name']
-        author = request.POST['author']
-        book = Request_Book(user=user, book_name=book_name, author=author)
-        book.save()
-        return render(request, "request_books.html",{'book':book})
-    return render(request, "request_books.html")
+        book_name = request.POST.get('book_name')
+        author = request.POST.get('author')
+        if not book_name or not author:
+            messages.error(request, 'Both book name and author are required.')
+        else:
+            # Save book if validation passes
+            book = Request_Book(user=user, book_name=book_name, author=author)
+            book.save()
+            messages.success(request, 'Book request submitted successfully.')
+    # Calculate counts
+    cart_item_count = Cart.objects.filter(user=request.user).count()
+    wish_item_count = Wishlist.objects.filter(user=request.user).count()
+
+    context = {
+        'cart_item_count': cart_item_count,
+        'wish_item_count': wish_item_count,
+    }
+
+    return render(request, "request_books.html", context)
 
 def requested_books(request):
     requested_book = Request_Book.objects.all()

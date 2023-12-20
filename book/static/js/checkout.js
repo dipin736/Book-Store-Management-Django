@@ -65,7 +65,7 @@ $(document).ready(function () {
                     "prefill": {
                         "name": $("#id_name").val(),
                         "email": $("#id_email").val(),
-                        "mobile": $("#id_mobile").val(),
+                        "contact": $("#id_mobile").val(), // Set the mobile number from the form
                         "address": $("#id_address").val(),
                         "city": $("#id_city").val(),
                         "pincode": $("#id_pincode").val(),
@@ -96,7 +96,3 @@ function validateForm() {
     
     return isValid;
 }
-
-
-
-

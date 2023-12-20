@@ -51,16 +51,68 @@
     background-color: #4466f2 !important;
     border-color: #4466f2 !important;
   }
-</style>
+  @media only screen and (max-width: 800px) {
+    /* Force table to not be like tables anymore */
+    #responsive-cart-table table,
+    #responsive-cart-table thead,
+    #responsive-cart-table tbody,
+    #responsive-cart-table th,
+    #responsive-cart-table td,
+    #responsive-cart-table tr {
+      display: block;
+    }
 
-<div class="container pt-4">
+    /* Hide table headers (but not display: none;, for accessibility) */
+    #responsive-cart-table thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    #responsive-cart-table tr {
+      border: 1px solid #ccc;
+    }
+
+    #responsive-cart-table td {
+      /* Behave like a "row" */
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+      white-space: normal;
+      text-align: left;
+    }
+
+    #responsive-cart-table td:before {
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      text-align: left;
+      font-weight: bold;
+    }
+
+    /* Label the data */
+    #responsive-cart-table td:before {
+      content: attr(data-title);
+    }
+  }
+</style>
+<div class="card-header">
+  <a href="{% url 'display' %}" class="btn btn-warning text-white"><i class="fa fa-reply"></i>Back</a>
+</div>
+<div class="container pt-4  ">
   <div class="row m-3 wishdata">
     {% if cart %}
-    <div class="col-md-12 table-hover book_qty bg-light rounded" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
-      <table class="table">
+    <div class="col-md-12 table-hover book_qty bg-light rounded"
+      style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
+      <table class="mt-2 table table-bordered" id="responsive-cart-table">
         <thead class="">
           <tr>
-            <!-- <th>ID</th> -->
             <th>IMAGE</th>
             <th>CATEGORY</th>
             <th>UNIT</th>
@@ -73,14 +125,13 @@
         <tbody>
           {% for i in cart %}
           <tr class="book_qty">
-            <!-- <td scope="row">{{i.book.id}}</td> -->
-            <td>
-              <img src="/media/{{i.book.image}}" style="height: 120px; width: 160px" />
+            <td data-title="IMAGE">
+              <img src="/media/{{i.book.image}}" style="height: 120px; width: 130px" />
             </td>
-            <td>{{i.book.category}}</td>
-            <td>{{i.book.price | stringformat:'d'}}</td>
-            <td>{{i.book.author}}</td>
-            <td>
+            <td data-title="CATEGORY">{{i.book.category}}</td>
+            <td data-title="UNIT">{{i.book.price | stringformat:'d'}}</td>
+            <td data-title="AUTHOR">{{i.book.author}}</td>
+            <td data-title="QUANTITY">
               <div>
                 <input type="hidden" class="book_id" value="{{ i.book_id }}">
                 {% csrf_token %}
@@ -96,9 +147,8 @@
                 {% endif %}
               </div>
             </td>
-            <!-- <td>{{i.book.price}}</td> -->
-            <td>{{i.total_cost | stringformat:'d'}}</td>
-            <td>
+            <td data-title="TOTAL PRICE">{{i.total_cost | stringformat:'d'}}</td>
+            <td data-title="ACTION">
               <button class="btn btn-danger delete-cart-item-btn" data-cart-item-id="{{ i.id }}">Delete</button>
             </td>
           </tr>
@@ -108,8 +158,8 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>Total Amount</td>
-            <td colspan="5">{{ total_cost|stringformat:'d' }}</td>
+            <td data-title="Total Amount">Total Amount</td>
+            <td colspan="5" data-title="TOTAL COST">{{ total_cost|stringformat:'d' }}</td>
           </tr>
         </tbody>
       </table>
@@ -121,7 +171,7 @@
       </div>
     </div>
     {% else %}
-    <div class="container-fluid mt-100">
+    <div class="container-fluid mt-50">
       <div class="row">
         <div class="col">
           <div class="card">
