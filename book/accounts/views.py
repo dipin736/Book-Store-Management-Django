@@ -380,6 +380,11 @@ def booking(request):
             order.status = False
             order.tracking_no = str(uuid.uuid4().fields[-1])[:6].upper()
 
+            order.payment_id = request.POST.get('payment_id')
+            order.payment_method = request.POST.get('payment_method')
+
+
+
             cart_items = Cart.objects.filter(user=request.user)
             total_cost = Cart.total_cost_of_products(cart_items)
             order.total_price = total_cost
@@ -387,9 +392,13 @@ def booking(request):
             order_placed = True
             messages.success(request, f"Order placed successfully! Your tracking number is {order.tracking_no}.")
 
-            if order.payment_method == 'Pay by Razor Pay':
-                return JsonResponse({'status': "Your order has been successfully"})
-
+            if order.payment_method == 'RAZORPAY':
+                print("Razorpay payment method selected")
+            # Ensure that the payment is successful before returning JsonResponse
+                return JsonResponse({'status': "Your order has been successfully", 'payment_status': 'success'})
+            else:
+                print("Unknown payment method:", order.payment_method)
+            
             for cart_item in cart_items:
                 OrderItem.objects.create(
                     order=order,
@@ -421,6 +430,18 @@ def booking(request):
 
 # razor pay
 import razorpay
+# views.py
+
+from django.http import JsonResponse
+from .models import Cart
+
+def delete_cart_items(request):
+    if request.user.is_authenticated:
+        # Assuming your Cart model has a ForeignKey to the User model
+        Cart.objects.filter(user=request.user).delete()
+        return JsonResponse({'status': 'Cart items deleted successfully'})
+    else:
+        return JsonResponse({'status': 'User not authenticated'}, status=400)
 
 
 def razorpaycheck(request):

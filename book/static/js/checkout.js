@@ -18,6 +18,7 @@ $(document).ready(function () {
             method: "GET",
             url: "/proceed-to-pay",
             success: function (response) {
+                console.log("Razorpay key received:", response.razorpay_key);
                 var razorpayId = response.razorpay_key;
                 var options = {
                     "key": razorpayId,
@@ -27,6 +28,7 @@ $(document).ready(function () {
                     "description": "Thank you for buying from us",
                     "image": "https://api-private.atlassian.com/users/2f53e44a56a080cf94841b1a3196d154/avatar",
                     "handler": function (responseFromRazorpay) {
+                        alert(responseFromRazorpay.razorpay_payment_id)
                         data = {
                             "name": $("#id_name").val(),
                             "email": $("#id_email").val(),
@@ -34,6 +36,7 @@ $(document).ready(function () {
                             "address": $("#id_address").val(),
                             "city": $("#id_city").val(),
                             "pincode": $("#id_pincode").val(),
+                            "payment_method": "RAZORPAY",
                             "payment_id": responseFromRazorpay.razorpay_payment_id,
                             'csrfmiddlewaretoken': token
                         };
@@ -42,13 +45,18 @@ $(document).ready(function () {
                             method: "POST",
                             url: "/booking/",
                             data: data,
-                            success: function (response) {
+                            success: function (responsec) {
                                 Swal.fire({
                                     icon: "success",
                                     title: "Congratulations!",
-                                    text: response.status
+                                    text: responsec.status
                                 }).then(function () {
-                                    window.location.href = '/display/';
+                                    // Make a separate AJAX request to delete cart items
+                                    deleteCartItems(function() {
+                                        console.log("Cart items deleted. Redirecting to /display/");
+                                        // Redirect to the desired page after deleting cart items
+                                        window.location.href = '/display/';
+                                    });
                                 });
                             },
                             error: function (error) {
@@ -65,7 +73,7 @@ $(document).ready(function () {
                     "prefill": {
                         "name": $("#id_name").val(),
                         "email": $("#id_email").val(),
-                        "contact": $("#id_mobile").val(), // Set the mobile number from the form
+                        "contact": $("#id_mobile").val(),
                         "address": $("#id_address").val(),
                         "city": $("#id_city").val(),
                         "pincode": $("#id_pincode").val(),
@@ -77,13 +85,16 @@ $(document).ready(function () {
 
                 var rzp1 = new Razorpay(options);
                 rzp1.open();
+            },
+            error: function (error) {
+                // Handle error
+                console.log("Error:", error);
             }
         });
     });
 });
 
 function validateForm() {
-    // Add logic to validate form fields
     var isValid = true;
 
     // Example: Check if the name field is empty
@@ -95,4 +106,21 @@ function validateForm() {
     // Add similar checks for other form fields
     
     return isValid;
+}
+
+function deleteCartItems(callback) {
+    $.ajax({
+        method: "GET",
+        url: "/delete-cart-items",
+        success: function (response) {
+            console.log("Cart items deleted successfully");
+            // Call the callback function after successful deletion
+            if (callback && typeof callback === "function") {
+                callback();
+            }
+        },
+        error: function (error) {
+            console.log("Error deleting cart items:", error);
+        }
+    });
 }

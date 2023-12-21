@@ -52,12 +52,11 @@ class Cart(models.Model):
 
 class Order(models.Model):
    
-    PAYMENT=(
-        ('Credict Card','Credict Card'),
-        ('G-Pay','G-pay'),
-        ('Paypal','Paypal'),
-
-    ) 
+    PAYMENT_CHOICES = [
+        ('COD', 'Cash on Delivery'),
+        ('RAZORPAY', 'Razor Pay'),
+    ]
+      
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     email = models.CharField(max_length=50,null=False)
@@ -71,10 +70,10 @@ class Order(models.Model):
     payment_id=models.CharField(max_length=50,null=True)
     tracking_no=models.CharField(max_length=50,null=True)
     status=models.BooleanField(max_length=50,default=False)
-    payment_method = models.CharField(max_length = 20,choices=PAYMENT ,default='Paypal')
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='COD')
 
     def __str__(self):
-        return f'{self.id, self.tracking_no}'
+        return f'{self.payment_method, self.tracking_no,self.name}'
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

@@ -52,7 +52,7 @@ urlpatterns = [
     path('booking/',booking,name='booking'),
     path('view-order/',view_order,name='view_order'),
     path('view-my-order/<str:t_no>/',view_my_order, name='view_my_order'),
-
+    path('delete-cart-items/', delete_cart_items, name='delete_cart_items'),
     # WISHLIST
 
     path('wishlist/',wishlist,name='wishlist'),

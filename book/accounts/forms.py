@@ -25,7 +25,7 @@ class OrderModelForm(forms.ModelForm):
         """Meta definition for OrderModel form."""
 
         model = Order
-        fields = ['name', 'email', 'mobile', 'address', 'city', 'pincode']
+        fields = ['name', 'email', 'mobile', 'address', 'city', 'pincode','payment_method']
 
 
 class OrderForm(forms.ModelForm):

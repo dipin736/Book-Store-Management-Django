@@ -43,12 +43,20 @@ class BookAdmin(admin.ModelAdmin):
 
 admin.site.register(Cart)
 
-admin.site.register(Order)
-
 admin.site.register(review)
 
+class OrderAdmin(admin.ModelAdmin):
+    # Remove the line below if 'category' is not a field in your 'Order' model
+    # autocomplete_fields = ['category']
+   
+    list_display=['name','total_price','payment_method','status','tracking_no','created_at','updated_at']
+    list_editable=['status']
 
 
+   
+    list_per_page = 5
+   
 
 
-
+# Register the model with the admin site along with its configuration
+admin.site.register(Order, OrderAdmin)
