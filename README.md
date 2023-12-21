@@ -62,7 +62,7 @@ Make sure you have the following installed:
    python manage.py runserver
    
 ### Creating-superuser
-  python manage.py createsuperuser
+  python manage.py createsuperuser-for Admin
 
 ### Setting Up Razorpay
 Sign up on the  [Razorpay website](https://razorpay.com/) and create an account.
@@ -77,7 +77,7 @@ RAZORPAY_API_KEY = 'your_razorpay_api_key'
 ### Usage
 Visit http://localhost:8000/ in your web browser to access the application. Explore the various features provided by the online bookstore, including the Razorpay payment option.
 
-### Separate HTML for Admin
+### Separate HTML for Admin(Use Createsuperuser)
 The admin side has its own set of HTML templates, providing a dedicated and customized interface for managing books and users. The HTML templates for the admin can be found in the admin_templates directory.
 
 ### Screenshot
