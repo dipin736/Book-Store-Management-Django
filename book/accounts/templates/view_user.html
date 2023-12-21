@@ -4,42 +4,90 @@
 
 {% block main %}
 
+<style>
+    @media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #responsive-customer-table table,
+        #responsive-customer-table thead,
+        #responsive-customer-table tbody,
+        #responsive-customer-table th,
+        #responsive-customer-table td,
+        #responsive-customer-table tr {
+            display: block;
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #responsive-customer-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #responsive-customer-table tr {
+            border: 1px solid #ccc;
+        }
+
+        #responsive-customer-table td {
+            /* Behave like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+        #responsive-customer-table td:before {
+            /* Now like a table header */
+            position: absolute;
+            /* Top/left values mimic padding */
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Label the data */
+        #responsive-customer-table td:before {
+            content: attr(data-title);
+        }
+    }
+</style>
+
 <div class="container">
     <div class="row">
         <div class="col">
-            <div class="table">
-                <table class="table table table-light table-hover">
+            <div class="table-responsive" id="responsive-customer-table">
+                <table class="table table-light table-hover">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>USERNAME</th>
                             <th>EMAIL ID</th>
-                            <!-- <th>PHOTO</th> -->
+                            <th>PHOTO</th>
                             <th>CONTACT</th>
                             <th>ADDRESS</th>
                             <th>USER ROLE</th>
                             <th>ACTION</th>
-
                         </tr>
                     </thead>
                     <tbody>
                         {% for i in customers %}
-
                             <tr>
-                                <td>{{i.id}}</td>
-                                <td>{{i.username}}</td>
-                                <td>{{i.email}}</td>
-                                <!-- <td><img src="/media/{{i.photo}}" style="width:50px"/></td> -->
-                                <td>{{i.phone}}</td>
-                                <td>{{i.address}}</td>
-                                <td>{{i.user_type}}</td>
-
-                                <td>
-                                    <a href="{% url 'delete_category' id=i.id %}"  class=" demo btn btn-danger"> Delete</a>
-                    
+                                <td data-title="ID">{{i.id}}</td>
+                                <td data-title="USERNAME">{{i.username}}</td>
+                                <td data-title="EMAIL ID">{{i.email}}</td>
+                                <td data-title="PHOTO"><img src="/media/{{i.photo}}" style="width:50px"/></td>
+                                <td data-title="CONTACT">{{i.phone}}</td>
+                                <td data-title="ADDRESS">{{i.address}}</td>
+                                <td data-title="USER ROLE">{{i.user_type}}</td>
+                                <td data-title="ACTION">
+                                    <a href="{% url 'delete_category' id=i.id %}" class="demo btn btn-danger">Delete</a>
                                 </td>
                             </tr>
-                         
                         {% endfor %}
                     </tbody>
                 </table>

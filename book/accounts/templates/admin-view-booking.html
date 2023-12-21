@@ -2,13 +2,66 @@
 {% load static %}
 
 {% block main %}
+<style>
+    @media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #responsive-admin-order-table table,
+        #responsive-admin-order-table thead,
+        #responsive-admin-order-table tbody,
+        #responsive-admin-order-table th,
+        #responsive-admin-order-table td,
+        #responsive-admin-order-table tr {
+            display: block;
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #responsive-admin-order-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #responsive-admin-order-table tr {
+            border: 1px solid #ccc;
+        }
+
+        #responsive-admin-order-table td {
+            /* Behave like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+        #responsive-admin-order-table td:before {
+            /* Now like a table header */
+            position: absolute;
+            /* Top/left values mimic padding */
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Label the data */
+        #responsive-admin-order-table td:before {
+            content: attr(data-title);
+        }
+    }
+</style>
+
 <div class="container-fluid my-3">
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-body">
                     <h3>Admin View Order</h3>
-                    <div class="cart_info bg-light my-3">
+                    <div class="cart_info bg-light my-3" id="responsive-admin-order-table">
                         <table class="table table-bordered">
                             <thead class="text-center">
                                 <tr>
@@ -24,40 +77,36 @@
                             </thead>
                             <tbody class="text-center">
                                 {% for i in myorder %}
-                                <tr>
-                                    <td>{{i.tracking_no}}</td>
-                                    <td>{{ i.name }}</td>
-                                    <td>{{ i.email }}</td>
-                                    <td>{{i.mobile}}</td>
-                                    <td>{{i.address}},
-                                        {{i.city}}
-                                    </td>
-                                    <td>{{ i.created_at }}</td>
-                                    <td class="text-center ">
-                                        {% if i.status == True %}
-                                        <div class="progress">
-                                            <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
-                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                                            
-                                            <span style="color: black; background-color:rgb(12, 243, 12); font-size: larger ;">Confirmed <img src="https://previews.123rf.com/images/th3fisa/th3fisa1309/th3fisa130900049/22574975-sticker-of-green-glossy-check-mark-with-light-shadow.jpg" alt="" style="width: 30px;"></span>
-                                            </div>
-                                        </div>
-                                        {% else %}
-                                        <div class="progress">
-                                            <div class="progress-bar bg-danger progress-bar-striped" role="progressbar"
-                                            aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                                               Processing....
-                                            </div>
-                                        </div>
-                                        
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a class="btn btn-primary btn-xs" href="{% url 'update_order_view' i.id  %}"><span><i class="fa-solid fa-pen-to-square"></i></span></a>
-                                        <a href="{% url 'delete_order' i.id  %}"  class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
-                                        <a href="{% url 'admin_view_orders' i.tracking_no %}" class="btn btn-primary">View</a>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td data-title="Tracking ID">{{i.tracking_no}}</td>
+                                        <td data-title="Customer-Name">{{ i.name }}</td>
+                                        <td data-title="Email">{{ i.email }}</td>
+                                        <td data-title="Contact">{{i.mobile}}</td>
+                                        <td data-title="Address">{{i.address}}, {{i.city}}</td>
+                                        <td data-title="Order Date">{{ i.created_at }}</td>
+                                        <td data-title="Status" class="text-center">
+                                            {% if i.status == True %}
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                                        <span style="color: black; background-color:rgb(12, 243, 12); font-size: larger ;">Confirmed <img src="https://previews.123rf.com/images/th3fisa/th3fisa1309/th3fisa130900049/22574975-sticker-of-green-glossy-check-mark-with-light-shadow.jpg" alt="" style="width: 30px;"></span>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-danger progress-bar-striped" role="progressbar"
+                                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                                        Processing....
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td data-title="Action">
+                                            <a class="btn btn-primary btn-xs" href="{% url 'update_order_view' i.id  %}"><span><i class="fa-solid fa-pen-to-square"></i></span></a>
+                                            <a href="{% url 'delete_order' i.id  %}" class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
+                                            <a href="{% url 'admin_view_orders' i.tracking_no %}" class="btn btn-primary">View</a>
+                                        </td>
+                                    </tr>
                                 {% endfor %}
                             </tbody>
                         </table>

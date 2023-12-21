@@ -4,65 +4,118 @@
 {% block main %}
 
 
+<style>
+    @media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #responsive-order-details-table table,
+        #responsive-order-details-table thead,
+        #responsive-order-details-table tbody,
+        #responsive-order-details-table th,
+        #responsive-order-details-table td,
+        #responsive-order-details-table tr {
+            display: block;
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #responsive-order-details-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #responsive-order-details-table tr {
+            border: 1px solid #ccc;
+        }
+
+        #responsive-order-details-table td {
+            /* Behave like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+        #responsive-order-details-table td:before {
+            /* Now like a table header */
+            position: absolute;
+            /* Top/left values mimic padding */
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Label the data */
+        #responsive-order-details-table td:before {
+            content: attr(data-title);
+        }
+    }
+</style>
+
 <div class="container my-3">
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-body">
-                  <div class="row">
-                    <div class="col-md-12">
-                        <h4>Order Details</h4>
-                        <div class="card-body">
-                            <table class="table table-bordered">
-                                <thead class="text-center">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th>Img</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-center">
-                                    {% for i in order_items %}
-                                    <tr>
-                                        <td>{{ i.book.title }}</td>
-                                        <td>{{i.quantity}}</td>
-                                        <td>{{ i.price }}</td>
-                                        <td><img src="/media/{{i.book.image}}" style="width:50px"/></td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            <div class="row">
-                                <div class="col-md-9">
-                                    <h2>Grand Total</h2>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Order Details</h4>
+                            <div class="card-body" id="responsive-order-details-table">
+                                <table class="table table-bordered">
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Img</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center">
+                                        {% for i in order_items %}
+                                            <tr>
+                                                <td>{{ i.book.title }}</td>
+                                                <td>{{i.quantity}}</td>
+                                                <td>{{ i.price }}</td>
+                                                <td><img src="/media/{{i.book.image}}" style="width:50px"/></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <h2>Grand Total</h2>
+                                    </div>
+                                    <div class="col-md-3"> 
+                                        <h3 class="text-end">{{ order.total_price|floatformat:2 }}</h3>
+                                    </div>
                                 </div>
-                                <div class="col-md-3"> 
-                                    <h3 class="text-end">{{ order.total_price|floatformat:2 }}</h3>
-                                </div>
-                            </div>
-                            <h6 class="border p-2">Payment Mode : {{order.payment_method}}</h6>
-                            <h6 class="border p-2">Order Status :
+                                <h6 class="border p-2">Payment Mode : {{order.payment_method}}</h6>
+                                <h6 class="border p-2">Order Status :
                                     {% if order.status == True %}
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
-                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                                        <span style="color: black; background-color:rgb(12, 243, 12); font-size: larger ;">Confirmed <img src="https://previews.123rf.com/images/th3fisa/th3fisa1309/th3fisa130900049/22574975-sticker-of-green-glossy-check-mark-with-light-shadow.jpg" alt="" style="width: 30px;"></span>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                                                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                                <span style="color: black; background-color:rgb(12, 243, 12); font-size: larger ;">Confirmed <img src="https://previews.123rf.com/images/th3fisa/th3fisa1309/th3fisa130900049/22574975-sticker-of-green-glossy-check-mark-with-light-shadow.jpg" alt="" style="width: 30px;"></span>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% else %}
-                                    <div class="progress">
-                                        <div class="progress-bar bg-danger progress-bar-striped" role="progressbar"
-                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                                           Processing....
+                                        <div class="progress">
+                                            <div class="progress-bar bg-danger progress-bar-striped" role="progressbar"
+                                                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+                                                Processing....
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
-                            </h6>
-                            <h6 class="border p-2">Tracking No : {{order.tracking_no}}</h6>
+                                </h6>
+                                <h6 class="border p-2">Tracking No : {{order.tracking_no}}</h6>
+                            </div>
                         </div>
                     </div>
-                  </div>
                 </div>
             </div>
         </div>

@@ -3,48 +3,105 @@
 
 {% block main %}
 
-<div class="container">
+<style>
+    @media only screen and (max-width: 800px) {
+        /* Force table to not be like tables anymore */
+        #responsive-product-table table,
+        #responsive-product-table thead,
+        #responsive-product-table tbody,
+        #responsive-product-table th,
+        #responsive-product-table td,
+        #responsive-product-table tr {
+            display: block;
+        }
+
+        /* Hide table headers (but not display: none;, for accessibility) */
+        #responsive-product-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        #responsive-product-table tr {
+            border: 1px solid #ccc;
+        }
+
+        #responsive-product-table td {
+            /* Behave like a "row" */
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 50%;
+            white-space: normal;
+            text-align: left;
+        }
+
+        #responsive-product-table td:before {
+            /* Now like a table header */
+            position: absolute;
+            /* Top/left values mimic padding */
+            top: 6px;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        /* Label the data */
+        #responsive-product-table td:before {
+            content: attr(data-title);
+        }
+    }
+</style>
+
+<div class="container my-3">
     <div class="row">
-        <div class="col">
-            <div class="table">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>SL.NO</th>
-                            <th>Title</th>
-                            <th>Image</th>
-                            <th>Category</th>
-                            <th>Author</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Action</th>
-    
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        {% for i in book  %}
-                        <tr>
-                            <td>{{i.id}}</td>
-                            <td>{{i.title}}</td>
-                            <td><img src="/media/{{i.image}}" style="width:50px"/></td>
-                            <td>{{i.category}}</td>
-                            <td>{{i.author}}</td>
-                            <td>₹{{i.price}}</td>
-                            <td>{{i.stock}}</td>
-                            <td>
-                                <a href="{% url 'edit_product' i.id  %}" class="btn btn-primary btn-xs"><i class="fa-solid fa-pen-to-square"></i></a>
-                                <a href="{% url 'delete_product' i.id  %}"  class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                                                                 
-                    </tbody>
-                </table>
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Product Details</h4>
+                            <div class="card-body" id="responsive-product-table">
+                                <table class="table table-bordered">
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th>SL.NO</th>
+                                            <th>Title</th>
+                                            <th>Image</th>
+                                            <th>Category</th>
+                                            <th>Author</th>
+                                            <th>Price</th>
+                                            <th>Stock</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for i in book %}
+                                            <tr>
+                                                <td data-title="SL.NO">{{i.id}}</td>
+                                                <td data-title="Title">{{i.title}}</td>
+                                                <td data-title="Image"><img src="/media/{{i.image}}" style="width:50px"/></td>
+                                                <td data-title="Category">{{i.category}}</td>
+                                                <td data-title="Author">{{i.author}}</td>
+                                                <td data-title="Price">₹{{i.price}}</td>
+                                                <td data-title="Stock">{{i.stock}}</td>
+                                                <td data-title="Action">
+                                                    <a href="{% url 'edit_product' i.id  %}" class="btn btn-primary "><i class="fa-solid fa-pen-to-square"></i></a>
+                                                    <a href="{% url 'delete_product' i.id  %}" class=" demo btn btn-danger"><i class="fa-solid fa-trash"></i></a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-           
         </div>
     </div>
 </div>
-
 {% endblock main %}
