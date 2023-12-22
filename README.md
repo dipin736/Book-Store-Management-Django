@@ -54,7 +54,7 @@ Make sure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your_username/online-bookstore.git
+[   git clone https://github.com/your_username/online-bookstore.git](https://github.com/dipin736/Book-Store-Management-Django.git)
 
    cd online-bookstore
    pip install -r requirements.txt
